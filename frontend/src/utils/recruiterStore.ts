@@ -157,6 +157,9 @@ export function transformAnalysisToRankedCandidate(
   const skillsList = data.candidate.skills ||
     (data.fields.find((f) => f.field_id === 'SKILLS-LIST')?.value?.split(',').map((s) => s.trim()) || [])
 
+  const recruiterDecision: RecruiterDecisionStatus = (decisions && decisions[candidateId]) ? decisions[candidateId] : 'UNDECIDED'
+
+
   return {
     id: candidateId,
     rank: index + 1,
