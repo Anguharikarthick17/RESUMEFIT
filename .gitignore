@@ -29,3 +29,10 @@ yarn-error.log*
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Demo Resumes
+demo_resumes/
+0*_Resume.pdf
+10*_Resume.pdf
+ResumeFit_Demo_Candidates_README.pdf
+
