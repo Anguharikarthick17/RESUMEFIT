@@ -89,19 +89,19 @@ export default function Analyze({ onResults, onError }: AnalyzeProps) {
   const isReady = Boolean(file && jd.trim())
 
   return (
-    <div className="min-h-screen pt-6 pb-20 bg-slate-50">
+    <div className="min-h-screen pt-6 pb-20 bg-[#F8F8F7]">
       {/* ── Global 1400px Container ── */}
       <div className="app-container space-y-6">
         {/* Header */}
         <div className="dash-card p-6 sm:p-8 bg-white">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 mb-2">
-            <Sparkles size={12} className="text-blue-600" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] border border-[#E5E5E5] mb-2 font-mono">
+            <Sparkles size={12} className="text-[#111111]" />
             Analysis Workspace
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#111111] tracking-tight">
             Analyze Candidate Resume
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+          <p className="text-xs sm:text-sm text-[#666666] mt-1 max-w-2xl">
             Upload the candidate's resume and define the target job requirements to generate an evidence-backed evaluation report.
           </p>
         </div>
@@ -121,11 +121,11 @@ export default function Analyze({ onResults, onError }: AnalyzeProps) {
             {/* Right: JD (50%) */}
             <div className="flex flex-col h-full justify-between">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 font-mono flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                <label className="text-[11px] font-bold uppercase tracking-wider text-[#666666] font-mono flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-black" />
                   02 / Target Job Description
                 </label>
-                <span className="text-xs text-slate-400 font-mono">
+                <span className="text-xs text-[#888888] font-mono">
                   {jd.length} chars
                 </span>
               </div>
@@ -138,7 +138,7 @@ export default function Analyze({ onResults, onError }: AnalyzeProps) {
                     setValidationError(null)
                   }}
                   placeholder="Paste the job description requirements you want to evaluate this candidate against..."
-                  className="flex-1 w-full h-full p-4 text-xs sm:text-sm font-sans bg-slate-50 border border-slate-200 rounded-xl resize-none outline-none focus:bg-white focus:border-blue-500 focus:ring-3 focus:ring-blue-100 transition-all text-slate-800 placeholder-slate-400 leading-relaxed"
+                  className="flex-1 w-full h-full p-4 text-xs sm:text-sm font-sans bg-[#F8F8F7] border border-[#E5E5E5] rounded-xl resize-none outline-none focus:bg-white focus:border-black transition-all text-[#111111] placeholder-[#888888] leading-relaxed"
                 />
               </div>
 
@@ -149,7 +149,7 @@ export default function Analyze({ onResults, onError }: AnalyzeProps) {
                     setJd(SAMPLE_JD)
                     setValidationError(null)
                   }}
-                  className="text-xs font-semibold text-blue-600 hover:text-blue-800 underline"
+                  className="text-xs font-semibold text-[#111111] hover:text-black underline"
                 >
                   Load sample Java/Spring job description
                 </button>
@@ -157,7 +157,7 @@ export default function Analyze({ onResults, onError }: AnalyzeProps) {
                   <button
                     type="button"
                     onClick={() => setJd('')}
-                    className="text-xs text-slate-400 hover:text-slate-600"
+                    className="text-xs text-[#888888] hover:text-[#111111]"
                   >
                     Clear text
                   </button>

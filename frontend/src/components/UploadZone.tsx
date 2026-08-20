@@ -48,11 +48,11 @@ export default function UploadZone({ onFile, file }: UploadZoneProps) {
   return (
     <div className="flex flex-col h-full justify-between">
       <div className="flex items-center justify-between mb-2">
-        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 font-mono flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+        <label className="text-[11px] font-bold uppercase tracking-wider text-[#666666] font-mono flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-black" />
           01 / Candidate Resume
         </label>
-        <span className="text-xs text-slate-400 font-mono">PDF / DOCX • Max 10MB</span>
+        <span className="text-xs text-[#888888] font-mono">PDF / DOCX • Max 10MB</span>
       </div>
 
       <label
@@ -61,10 +61,10 @@ export default function UploadZone({ onFile, file }: UploadZoneProps) {
         onDrop={handleDrop}
         className={`flex-1 relative flex flex-col items-center justify-center p-6 rounded-xl cursor-pointer transition-all min-h-[280px] sm:min-h-[310px] ${
           dragOver
-            ? 'bg-blue-50/80 border-2 border-blue-500 ring-4 ring-blue-100'
+            ? 'bg-[#F2F2F2] border-2 border-black ring-4 ring-neutral-200'
             : file
             ? 'bg-emerald-50/30 border-2 border-emerald-300'
-            : 'bg-slate-50/70 hover:bg-slate-100/70 border-2 border-dashed border-slate-300 hover:border-slate-400'
+            : 'bg-[#F8F8F7] hover:bg-[#F2F2F2] border-2 border-dashed border-[#D4D4D4] hover:border-black'
         }`}
       >
         <input
@@ -83,16 +83,16 @@ export default function UploadZone({ onFile, file }: UploadZoneProps) {
               exit={{ opacity: 0, scale: 0.96 }}
               className="text-center flex flex-col items-center"
             >
-              <div className="w-12 h-12 rounded-xl bg-white shadow-2xs border border-slate-200 flex items-center justify-center mb-3 text-blue-600">
+              <div className="w-12 h-12 rounded-xl bg-white shadow-2xs border border-[#E5E5E5] flex items-center justify-center mb-3 text-[#111111]">
                 <UploadCloud size={24} />
               </div>
-              <p className="text-sm font-bold text-slate-800 mb-0.5">
+              <p className="text-sm font-bold text-[#111111] mb-0.5">
                 Drop PDF or DOCX here
               </p>
-              <p className="text-xs text-slate-500">
-                or <span className="text-blue-600 font-semibold underline">browse</span> from your computer
+              <p className="text-xs text-[#666666]">
+                or <span className="text-[#111111] font-semibold underline">browse</span> from your computer
               </p>
-              <span className="text-[11px] text-slate-400 font-mono mt-2.5">
+              <span className="text-[11px] text-[#888888] font-mono mt-2.5">
                 Max 10 MB
               </span>
             </motion.div>
@@ -113,14 +113,14 @@ export default function UploadZone({ onFile, file }: UploadZoneProps) {
                 <span>Resume ready</span>
               </div>
 
-              <p className="text-sm font-bold text-slate-900 truncate max-w-full px-2">
+              <p className="text-sm font-bold text-[#111111] truncate max-w-full px-2">
                 {file.name}
               </p>
-              <p className="text-xs text-slate-500 font-mono mt-0.5 mb-3">
+              <p className="text-xs text-[#777777] font-mono mt-0.5 mb-3">
                 {formatFileSize(file.size)}
               </p>
 
-              <span className="text-xs text-blue-600 hover:text-blue-800 font-semibold underline">
+              <span className="text-xs text-[#111111] hover:text-black font-semibold underline">
                 Change file
               </span>
             </motion.div>

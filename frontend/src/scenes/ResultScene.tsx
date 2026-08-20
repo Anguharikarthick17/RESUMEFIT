@@ -23,14 +23,14 @@ function ScoreRing() {
       {/* Background ring */}
       <mesh>
         <torusGeometry args={[1.75, 0.025, 8, 96]} />
-        <meshBasicMaterial color="#E2E8F0" />
+        <meshBasicMaterial color="#E5E5E5" />
       </mesh>
 
       {/* Main animated ring */}
       <mesh ref={outerRef}>
         <torusGeometry args={[1.75, 0.045, 8, 96]} />
         <meshStandardMaterial
-          color="#2563EB"
+          color="#111111"
           metalness={0.4}
           roughness={0.2}
         />
@@ -39,7 +39,7 @@ function ScoreRing() {
       {/* Inner accent ring */}
       <mesh ref={innerRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2.05, 0.012, 8, 64]} />
-        <meshStandardMaterial color="#60A5FA" transparent opacity={0.5} />
+        <meshStandardMaterial color="#666666" transparent opacity={0.5} />
       </mesh>
     </group>
   )
@@ -55,7 +55,7 @@ export default function ResultScene({ score: _score }: { score: number }) {
     >
       <ambientLight intensity={0.9} />
       <directionalLight position={[3, 5, 3]} intensity={1.2} color="#ffffff" />
-      <pointLight position={[-3, -2, -2]} intensity={0.5} color="#3B82F6" />
+      <pointLight position={[-3, -2, -2]} intensity={0.5} color="#111111" />
       <ScoreRing />
     </Canvas>
   )

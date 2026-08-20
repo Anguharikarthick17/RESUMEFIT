@@ -1,25 +1,26 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles, TrendingUp, CheckSquare, PlusCircle, ArrowRight } from 'lucide-react'
-import type { ImprovementOption, SimulationResult } from '../types/intelligence'
-import type { RequirementMatch } from '../types/resume'
-import { simulateImprovements } from '../utils/intelligenceEngine'
+import { Sparkles, TrendingUp, CheckCircle2, ArrowRight, RefreshCw, Zap } from 'lucide-react'
+import type { ImprovementOption, ImprovementSimulationResult } from '../types/intelligence'
+import { simulateResumeEnhancement } from '../utils/intelligenceEngine'
 
 interface ImprovementSimulatorViewProps {
-  currentFit: number
-  allRequirements: RequirementMatch[]
+  initialScore: number
   options: ImprovementOption[]
-  onOpenVersions?: () => void
+  totalReqs: number
+  matchedReqs: number
+  partialReqs: number
 }
 
 export default function ImprovementSimulatorView({
-  currentFit,
-  allRequirements,
+  initialScore,
   options,
-  onOpenVersions,
+  totalReqs,
+  matchedReqs,
+  partialReqs,
 }: ImprovementSimulatorViewProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [simulation, setSimulation] = useState<SimulationResult | null>(null)
+  const [simulation, setSimulation] = useState<ImprovementSimulationResult | null>(null)
 
   const toggleOption = (id: string) => {
     setSelectedIds((prev) =>
@@ -28,8 +29,15 @@ export default function ImprovementSimulatorView({
   }
 
   const handleSimulate = () => {
-    const result = simulateImprovements(currentFit, allRequirements, selectedIds, options)
-    setSimulation(result)
+    const res = simulateResumeEnhancement(
+      initialScore,
+      options,
+      selectedIds,
+      totalReqs,
+      matchedReqs,
+      partialReqs,
+    )
+    setSimulation(res)
   }
 
   const handleSelectAll = () => {
@@ -44,27 +52,27 @@ export default function ImprovementSimulatorView({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+      <div className="dash-card p-6 sm:p-8 bg-white flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#E5E5E5] gap-3">
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 font-mono">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] px-2.5 py-0.5 rounded border border-[#E5E5E5]">
             Interactive Career Simulation
           </span>
-          <h3 className="text-xl font-bold text-slate-900 mt-0.5">
+          <h3 className="text-xl sm:text-2xl font-black text-[#111111] mt-1">
             What If I Improve My Resume?
           </h3>
         </div>
 
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-2 text-xs font-semibold">
           <button
             onClick={handleSelectAll}
-            className="text-blue-600 hover:underline font-semibold"
+            className="text-[#111111] hover:underline font-bold"
           >
             Select All
           </button>
-          <span className="text-slate-300">•</span>
+          <span className="text-[#CCCCCC]">•</span>
           <button
             onClick={handleClearAll}
-            className="text-slate-500 hover:underline"
+            className="text-[#777777] hover:underline"
           >
             Reset
           </button>
@@ -75,13 +83,13 @@ export default function ImprovementSimulatorView({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Potential Resume Enhancements */}
         <div className="lg:col-span-7 space-y-3">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+          <div className="flex items-center justify-between text-xs text-[#777777] font-medium">
             <span>Select potential skills, projects, or certifications to simulate:</span>
             <span className="font-mono">{selectedIds.length} selected</span>
           </div>
 
           {options.length === 0 ? (
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl text-center text-xs text-slate-500">
+            <div className="p-5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-xl text-center text-xs text-[#777777]">
               Candidate already matches 100% of requirements. No missing requirements available to simulate.
             </div>
           ) : (
@@ -93,27 +101,27 @@ export default function ImprovementSimulatorView({
                     key={opt.id}
                     className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-blue-50/90 border-blue-500 shadow-2xs ring-2 ring-blue-200/50'
-                        : 'bg-white hover:bg-slate-50 border-slate-200 shadow-2xs'
+                        ? 'bg-[#F8F8F7] border-black shadow-2xs ring-1 ring-black'
+                        : 'bg-white hover:bg-[#FAFAFA] border-[#E5E5E5] shadow-2xs'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => toggleOption(opt.id)}
-                      className="mt-1 w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+                      className="mt-1 w-4 h-4 rounded text-black focus:ring-black border-[#CCCCCC]"
                     />
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
+                        <span className="text-xs sm:text-sm font-bold text-[#111111] leading-snug">
                           {opt.label}
                         </span>
-                        <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                           +{opt.estimated_impact_pts} pts
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5 font-mono truncate">
+                      <p className="text-[11px] text-[#777777] mt-0.5 font-mono truncate">
                         Fulfills requirement: {opt.requirement_matched}
                       </p>
                     </div>
@@ -127,97 +135,75 @@ export default function ImprovementSimulatorView({
             <button
               onClick={handleSimulate}
               disabled={selectedIds.length === 0}
-              className="btn-primary w-full py-3 text-xs sm:text-sm font-bold shadow-sm"
+              className="btn-primary w-full py-3 text-xs sm:text-sm font-bold shadow-sm disabled:opacity-40"
             >
-              <Sparkles size={15} />
-              <span>Simulate Selected Improvements ({selectedIds.length})</span>
+              <Zap size={14} />
+              <span>Simulate Selected Enhancements ({selectedIds.length})</span>
             </button>
           </div>
         </div>
 
-        {/* Right Column: Real-Time Score Projection */}
-        <div className="lg:col-span-5 sticky top-20">
-          <div className="dash-card p-6 bg-white space-y-5">
+        {/* Right Column: Simulation Result Box */}
+        <div className="lg:col-span-5">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="dash-card p-6 bg-white space-y-5 border border-[#E5E5E5]"
+          >
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                Deterministic Projection
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#777777]">
+                Simulation Projection
               </span>
-              <h4 className="text-base font-bold text-slate-900 mt-0.5">
-                Fit Score Evolution
+              <h4 className="text-base font-black text-[#111111] mt-0.5">
+                Simulated Match Outcome
               </h4>
             </div>
 
-            {/* Score Comparison Visual */}
-            <div className="grid grid-cols-2 gap-3 text-center">
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block mb-1">
+            {/* Score Comparison Widget */}
+            <div className="flex items-center justify-around p-4 bg-[#F8F8F7] border border-[#E5E5E5] rounded-2xl text-center">
+              <div>
+                <span className="text-[10px] font-mono text-[#777777] font-bold block">
                   CURRENT FIT
                 </span>
-                <span className="text-3xl font-black text-slate-900">
-                  {currentFit}%
+                <span className="text-2xl font-black font-mono text-[#111111]">
+                  {initialScore}%
                 </span>
               </div>
 
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <span className="text-[10px] font-mono uppercase text-emerald-700 font-bold block mb-1">
+              <ArrowRight size={20} className="text-[#AAAAAA]" />
+
+              <div>
+                <span className="text-[10px] font-mono text-emerald-800 font-bold block">
                   PROJECTED FIT
                 </span>
-                <span className="text-3xl font-black text-emerald-700">
-                  {simulation ? `${simulation.projected_fit}%` : `${currentFit}%`}
+                <span className="text-2xl font-black font-mono text-emerald-700">
+                  {simulation ? simulation.simulated_score : initialScore}%
                 </span>
               </div>
             </div>
 
-            {/* Projected Gain Badge */}
-            {simulation && simulation.delta > 0 ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-3.5 rounded-xl bg-emerald-100/70 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <TrendingUp size={16} className="text-emerald-700" />
-                  <span>Projected Growth:</span>
+            {simulation && (
+              <div className="space-y-3 pt-2">
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs space-y-1">
+                  <div className="flex items-center justify-between font-bold text-emerald-900">
+                    <span>Score Increase:</span>
+                    <span className="font-mono">+{simulation.points_gained} Points</span>
+                  </div>
+                  <div className="flex items-center justify-between text-emerald-800">
+                    <span>New Readiness Tier:</span>
+                    <span className="font-mono font-bold">{simulation.new_tier}</span>
+                  </div>
                 </div>
-                <span className="text-sm font-black font-mono text-emerald-800">
-                  +{simulation.delta} Percentage Points
-                </span>
-              </motion.div>
-            ) : null}
 
-            {/* Simulated Requirement Counts */}
-            {simulation ? (
-              <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
-                <div className="flex items-center justify-between text-slate-700">
-                  <span>Projected Matched Requirements:</span>
-                  <span className="font-mono font-bold text-emerald-600">
-                    {simulation.new_matched_count}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-slate-700">
-                  <span>Remaining Gaps:</span>
-                  <span className="font-mono font-bold text-rose-600">
-                    {simulation.new_missing_count}
-                  </span>
+                <div className="space-y-1 text-xs">
+                  <span className="font-bold text-[#111111] block">Grounded Summary:</span>
+                  <p className="text-[#666666] leading-relaxed">
+                    {simulation.summary}
+                  </p>
                 </div>
               </div>
-            ) : (
-              <p className="text-xs text-slate-400 italic text-center py-2">
-                Select one or more improvements on the left and click "Simulate" to calculate projected fit.
-              </p>
             )}
-
-            {onOpenVersions && (
-              <div className="pt-2 border-t border-slate-100">
-                <button
-                  onClick={onOpenVersions}
-                  className="btn-secondary w-full text-xs py-2"
-                >
-                  <span>Compare with Resume v2 →</span>
-                </button>
-              </div>
-            )}
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

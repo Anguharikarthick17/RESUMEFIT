@@ -11,6 +11,8 @@ import {
   ShieldCheck,
   AlertCircle,
   RefreshCw,
+  Building,
+  MapPin,
 } from 'lucide-react'
 import Navbar, { NavTab } from './components/Navbar'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -167,7 +169,7 @@ export default function App() {
   const appliedJobIds = candidateApplications.map((a) => a.job_id)
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-[#F8F8F7] font-sans text-[#111111]">
       {/* ── Global Header Navigation ── */}
       <Navbar
         currentTab={currentTab}
@@ -226,12 +228,12 @@ export default function App() {
                   exit={{ opacity: 0 }}
                   className="space-y-6"
                 >
-                  <div className="dash-card p-6 bg-white flex items-center justify-between">
+                  <div className="dash-card p-6 sm:p-8 bg-white flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-mono font-bold uppercase text-blue-600">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] px-2.5 py-0.5 rounded border border-[#E5E5E5]">
                         Supabase Database
                       </span>
-                      <h2 className="text-2xl font-black text-slate-900 mt-0.5">
+                      <h2 className="text-2xl sm:text-3xl font-black text-[#111111] mt-1">
                         Active Job Openings
                       </h2>
                     </div>
@@ -245,9 +247,9 @@ export default function App() {
                   </div>
 
                   {jobs.length === 0 ? (
-                    <div className="dash-card p-8 bg-white text-center text-xs text-slate-500 space-y-3">
-                      <Briefcase size={28} className="mx-auto text-slate-400" />
-                      <p className="font-semibold text-slate-700">No active job openings yet.</p>
+                    <div className="dash-card p-8 bg-white text-center text-xs text-[#777777] space-y-3">
+                      <Briefcase size={28} className="mx-auto text-[#AAAAAA]" />
+                      <p className="font-semibold text-[#111111]">No active job openings yet.</p>
                       <button
                         onClick={() => setIsNewScreeningOpen(true)}
                         className="btn-primary text-xs py-2 px-4 mx-auto"
@@ -261,19 +263,27 @@ export default function App() {
                         <div
                           key={j.id}
                           onClick={() => handleOpenJobInRecruiter(j)}
-                          className="dash-card p-6 bg-white space-y-3 cursor-pointer hover:border-blue-300 transition-all"
+                          className="dash-card p-6 bg-white space-y-3 cursor-pointer hover:border-[#111111] transition-all flex flex-col justify-between"
                         >
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
-                              {j.status}
-                            </span>
-                            <span className="text-xs text-slate-400 font-mono">{j.department}</span>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-mono font-bold bg-[#F5F5F4] text-[#111111] px-2 py-0.5 rounded border border-[#E5E5E5]">
+                                {j.status.toUpperCase()}
+                              </span>
+                              <span className="text-xs text-[#777777] font-mono flex items-center gap-1">
+                                <Building size={12} />
+                                <span>{j.department || 'Engineering'}</span>
+                              </span>
+                            </div>
+                            <h4 className="text-base font-bold text-[#111111]">{j.title}</h4>
+                            <p className="text-xs text-[#666666] font-sans line-clamp-2">{j.job_description}</p>
                           </div>
-                          <h4 className="text-base font-bold text-slate-900">{j.title}</h4>
-                          <p className="text-xs text-slate-500 font-sans line-clamp-2">{j.job_description}</p>
-                          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
+                          <div className="pt-3 border-t border-[#E5E5E5] flex items-center justify-between text-xs font-bold text-[#111111]">
                             <span>{j.candidates_count || 0} Applicants</span>
-                            <span>Open Screening →</span>
+                            <span className="flex items-center gap-1">
+                              <span>Open Screening</span>
+                              <ArrowRight size={13} />
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -299,9 +309,9 @@ export default function App() {
                         onUpdateCandidateDecision={handleUpdateCandidateDecision}
                       />
                     ) : (
-                      <div className="dash-card p-8 bg-white text-center text-xs text-slate-500 space-y-3">
-                        <Users size={28} className="mx-auto text-slate-400" />
-                        <p className="font-semibold text-slate-700">No active job selected.</p>
+                      <div className="dash-card p-8 bg-white text-center text-xs text-[#777777] space-y-3">
+                        <Users size={28} className="mx-auto text-[#AAAAAA]" />
+                        <p className="font-semibold text-[#111111]">No active job selected.</p>
                         <button
                           onClick={() => setIsNewScreeningOpen(true)}
                           className="btn-primary text-xs py-2 px-4 mx-auto"

@@ -1,160 +1,136 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle2, XCircle, HelpCircle, FileText, ShieldCheck } from 'lucide-react'
+import {
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Quote,
+  Layers,
+  Search,
+} from 'lucide-react'
 import type { ExtractedField } from '../types/resume'
-
-const STATUS_CONFIG = {
-  FOUND:     { label: 'Found',     pill: 'text-emerald-700 bg-emerald-50 border-emerald-200', icon: CheckCircle2 },
-  NOT_FOUND: { label: 'Not Found', pill: 'text-rose-700 bg-rose-50 border-rose-200', icon: XCircle },
-  AMBIGUOUS: { label: 'Ambiguous', pill: 'text-amber-700 bg-amber-50 border-amber-200', icon: HelpCircle },
-}
 
 interface EvidenceExplorerProps {
   fields: ExtractedField[]
 }
 
 export default function EvidenceExplorer({ fields }: EvidenceExplorerProps) {
-  const [selectedField, setSelectedField] = useState<ExtractedField | null>(fields[0] || null)
+  const [filterCategory, setFilterCategory] = useState<string>('ALL')
+  const [searchQuery, setSearchQuery] = useState<string>('')
+
+  const categories = Array.from(new Set(fields.map((f) => f.category)))
+
+  const filteredFields = fields.filter((f) => {
+    const matchesCat = filterCategory === 'ALL' || f.category === filterCategory
+    const matchesSearch =
+      f.field_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (f.value && f.value.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (f.evidence && f.evidence.toLowerCase().includes(searchQuery.toLowerCase()))
+    return matchesCat && matchesSearch
+  })
 
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
-        <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 font-mono">
-            Grounding & Traceability
-          </span>
-          <h3 className="text-xl font-bold text-slate-900 mt-0.5">
-            Evidence Explorer
-          </h3>
+    <div className="space-y-4">
+      {/* Search & Category Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="relative w-full sm:w-72">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search fields or evidence..."
+            className="w-full pl-8 pr-3 py-1.5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-lg text-xs text-[#111111] placeholder:text-[#888888] outline-none focus:border-black focus:bg-white transition-all"
+          />
         </div>
-        <div className="text-xs text-slate-500 font-medium font-mono">
-          10 Structured Fields • 100% Verifiable Text Spans
+
+        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+          <button
+            onClick={() => setFilterCategory('ALL')}
+            className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${
+              filterCategory === 'ALL'
+                ? 'bg-black border-black text-white'
+                : 'bg-white border-[#E5E5E5] text-[#555555] hover:bg-[#F5F5F4]'
+            }`}
+          >
+            All Categories
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setFilterCategory(cat)}
+              className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${
+                filterCategory === cat
+                  ? 'bg-black border-black text-white'
+                  : 'bg-white border-[#E5E5E5] text-[#555555] hover:bg-[#F5F5F4]'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Split View: Left 40% (lg:col-span-5), Right 60% (lg:col-span-7) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: 10 Field Cards List (40%) */}
-        <div className="lg:col-span-5 space-y-2.5">
-          {fields.map((field) => {
-            const isSelected = selectedField?.field_id === field.field_id
-            const cfg = STATUS_CONFIG[field.status] || STATUS_CONFIG.NOT_FOUND
-            const Icon = cfg.icon
+      {/* Fields List */}
+      <div className="space-y-3">
+        {filteredFields.map((field, idx) => {
+          const isFound = field.status === 'FOUND'
+          const isPartial = field.status === 'PARTIAL'
 
-            return (
-              <button
-                key={field.field_id}
-                onClick={() => setSelectedField(field)}
-                className={`w-full text-left p-4 rounded-xl border transition-all ${
-                  isSelected
-                    ? 'bg-blue-50/90 border-blue-500 shadow-2xs ring-2 ring-blue-200/50'
-                    : 'bg-white hover:bg-slate-50 border-slate-200 shadow-2xs'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <span className="text-[10px] font-mono font-bold text-slate-400">
+          return (
+            <div
+              key={idx}
+              className="dash-card p-4 bg-white border border-[#E5E5E5] space-y-2.5 hover:border-[#CCCCCC] transition-all"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold uppercase bg-[#F5F5F4] text-[#111111] px-2 py-0.5 rounded border border-[#E5E5E5]">
+                    {field.category}
+                  </span>
+                  <span className="font-bold text-xs text-[#111111]">
                     {field.field_id}
                   </span>
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold border ${cfg.pill}`}>
-                    <Icon size={11} />
-                    <span>{cfg.label}</span>
-                  </span>
                 </div>
 
-                <div className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                  {field.category}
-                </div>
+                <span
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
+                    isFound
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : isPartial
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : 'bg-rose-50 text-rose-800 border-rose-200'
+                  }`}
+                >
+                  {field.status}
+                </span>
+              </div>
 
-                <div className="text-xs text-slate-500 truncate mt-0.5">
-                  {field.value ?? field.reason ?? 'Not found in resume'}
-                </div>
-              </button>
-            )
-          })}
-        </div>
+              {/* Extracted Value */}
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase text-[#777777] block">
+                  Extracted Canonical Value
+                </span>
+                <p className="text-xs font-semibold text-[#111111] mt-0.5">
+                  {field.value || <span className="text-[#888888] italic">Not extracted</span>}
+                </p>
+              </div>
 
-        {/* Right Column: Evidence Inspector Panel (60%) */}
-        <div className="lg:col-span-7 sticky top-20">
-          <AnimatePresence mode="wait">
-            {selectedField ? (
-              <motion.div
-                key={selectedField.field_id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.15 }}
-                className="dash-card p-6 sm:p-7 space-y-5"
-              >
-                {/* Field Header */}
-                <div className="flex items-start justify-between pb-4 border-b border-slate-100">
-                  <div>
-                    <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded uppercase">
-                      {selectedField.field_id}
-                    </span>
-                    <h4 className="text-lg font-bold text-slate-900 mt-2">
-                      {selectedField.category}
-                    </h4>
+              {/* Verbatim Grounded Quote Snippet */}
+              {field.evidence && (
+                <div className="p-3 bg-[#F8F8F7] border border-[#E5E5E5] rounded-xl text-xs space-y-1">
+                  <div className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase text-[#777777]">
+                    <Quote size={10} className="text-[#111111]" />
+                    <span>Verbatim Source Evidence (Section: {field.section_grounding || 'Extracted Text'})</span>
                   </div>
-
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${STATUS_CONFIG[selectedField.status]?.pill}`}>
-                    {STATUS_CONFIG[selectedField.status]?.label}
-                  </span>
+                  <p className="text-[11px] text-[#333333] font-mono italic leading-relaxed">
+                    "{field.evidence}"
+                  </p>
                 </div>
-
-                {/* Extracted Value */}
-                <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono block mb-1.5">
-                    Extracted Value
-                  </label>
-                  <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed break-words">
-                    {selectedField.value ?? selectedField.reason ?? 'Not found in resume'}
-                  </div>
-                </div>
-
-                {/* Source Resume Section */}
-                {selectedField.source_section && (
-                  <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono block mb-1.5">
-                      Source Resume Section
-                    </label>
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-mono border border-slate-200">
-                      <FileText size={14} className="text-slate-500" />
-                      <span>{selectedField.source_section}</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Grounded Resume Text Evidence */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
-                      Grounded Resume Text Evidence
-                    </label>
-                    <span className="text-[11px] font-mono text-emerald-600 font-bold flex items-center gap-1">
-                      <ShieldCheck size={13} /> Verifiable Source
-                    </span>
-                  </div>
-
-                  {selectedField.evidence ? (
-                    <blockquote className="p-4 bg-blue-50/50 border-l-4 border-blue-600 rounded-r-xl text-xs sm:text-sm text-slate-800 font-sans italic leading-relaxed whitespace-pre-wrap break-words">
-                      "{selectedField.evidence}"
-                    </blockquote>
-                  ) : (
-                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-400 italic">
-                      Zero grounding evidence detected — field status is NOT_FOUND.
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-mono">
-                  <span>Grounding ID: {selectedField.field_id}</span>
-                  <span>Deterministic Trace</span>
-                </div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

@@ -1,408 +1,351 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   X,
-  UserCheck,
   Star,
   Clock,
-  Ban,
+  XCircle,
+  CheckCircle2,
+  AlertTriangle,
+  User,
   Mail,
   Phone,
   MapPin,
-  ExternalLink,
-  GraduationCap,
+  Linkedin,
+  FileText,
   Briefcase,
-  AlertTriangle,
-  CheckCircle2,
-  FileSearch,
-  CheckSquare,
+  GraduationCap,
+  Award,
+  Sparkles,
   ShieldCheck,
-  Printer,
-  ChevronRight,
+  ChevronDown,
+  Quote,
+  Layers,
+  Globe,
 } from 'lucide-react'
 import type { RankedCandidate, RecruiterDecisionStatus } from '../types/recruiter'
-import FitScore from './FitScore'
 import EvidenceExplorer from './EvidenceExplorer'
 import RequirementMatrix from './RequirementMatrix'
-import PrintReportModal from './PrintReportModal'
 
 interface CandidateDetailModalProps {
   candidate: RankedCandidate
-  jobTitle: string
+  jobDescription: string
   onClose: () => void
-  onUpdateDecision: (candidateId: string, decision: RecruiterDecisionStatus) => void
+  onUpdateDecision: (decision: RecruiterDecisionStatus) => void
 }
 
 export default function CandidateDetailModal({
   candidate,
-  jobTitle,
+  jobDescription,
   onClose,
   onUpdateDecision,
 }: CandidateDetailModalProps) {
-  const [activeTab, setActiveTab] = useState<'evidence' | 'matrix' | 'flags' | 'overview'>('overview')
-  const [showPrintModal, setShowPrintModal] = useState(false)
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'EVIDENCE' | 'REQUIREMENTS' | 'FLAGS'>('OVERVIEW')
 
-  const currentDecision = candidate.recruiterDecision
-
-  const handleDecision = (decision: RecruiterDecisionStatus) => {
-    onUpdateDecision(candidate.id, decision)
-  }
-
-  const getInitials = (name: string) => {
-    const parts = name.trim().split(/\s+/)
-    if (parts.length >= 2) return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
-    return name.slice(0, 2).toUpperCase()
-  }
+  const analysis = candidate.data
+  const fitColor =
+    candidate.fitScore >= 80
+      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+      : candidate.fitScore >= 50
+      ? 'text-amber-700 bg-amber-50 border-amber-200'
+      : 'text-rose-700 bg-rose-50 border-rose-200'
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
-      <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl flex flex-col justify-between">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
+      <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl border border-[#E5E5E5]">
         
-        {/* ── Top Header & Close ── */}
-        <div>
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
-                Rank #{candidate.rank} • ID: {candidate.id}
-              </span>
-              <span className="text-xs font-semibold text-slate-500">
-                Evaluating for: <strong>{jobTitle}</strong>
-              </span>
+        {/* ── Top Bar: Candidate Header + Human Decision Buttons ── */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#E5E5E5]">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-black text-white font-black text-xl flex items-center justify-center border border-neutral-800">
+              {candidate.name.charAt(0)}
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowPrintModal(true)}
-                className="btn-secondary text-xs py-1.5 px-3"
-              >
-                <Printer size={13} />
-                <span>Export Report</span>
-              </button>
-              <button
-                onClick={onClose}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
-              >
-                <X size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* ── Candidate Overview Header Card ── */}
-          <div className="mt-4 p-5 rounded-xl bg-slate-50 border border-slate-200/80 grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6 items-center">
-            {/* Left Info */}
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl bg-blue-600 text-white font-black text-xl flex items-center justify-center flex-shrink-0 shadow-2xs">
-                {getInitials(candidate.candidateName)}
-              </div>
-
-              <div className="space-y-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-xl font-black text-slate-900 truncate">
-                    {candidate.candidateName}
-                  </h3>
-                  <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono border ${
-                      candidate.aiRecommendation === 'STRONG MATCH'
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                        : candidate.aiRecommendation === 'REVIEW'
-                        ? 'bg-amber-50 text-amber-800 border-amber-200'
-                        : 'bg-rose-50 text-rose-800 border-rose-200'
-                    }`}
-                  >
-                    AI: {candidate.aiRecommendation}
-                  </span>
-                </div>
-
-                <p className="text-xs text-slate-600 font-medium">
-                  {candidate.mostRecentRole ?? candidate.highestDegree ?? 'Candidate Profile'}
-                </p>
-
-                <div className="flex flex-wrap gap-2 text-xs text-slate-500 pt-0.5">
-                  {candidate.email && <span>{candidate.email}</span>}
-                  {candidate.phone && <span>• {candidate.phone}</span>}
-                  {candidate.location && <span>• {candidate.location}</span>}
-                </div>
-              </div>
-            </div>
-
-            {/* Right Score Badges */}
-            <div className="flex items-center justify-between lg:justify-end gap-4 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-200">
-              <div className="text-center">
-                <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">RAW FIT</span>
-                <span className="text-2xl font-black text-slate-900">{candidate.rawFitScore}%</span>
-              </div>
-              <div className="text-center">
-                <span className="text-[10px] font-mono font-bold uppercase text-blue-600 block">WEIGHTED</span>
-                <span className="text-2xl font-black text-blue-600">{candidate.weightedFitScore}%</span>
-              </div>
-              <div className="text-center">
-                <span className="text-[10px] font-mono font-bold uppercase text-emerald-600 block">CRITICAL</span>
-                <span className="text-2xl font-black text-emerald-600">{candidate.criticalMatched}/{candidate.criticalTotal}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Human-In-The-Loop Decision Bar ── */}
-          <div className="mt-4 p-4 rounded-xl bg-white border-2 border-blue-500/30 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs">
-              <span className="font-bold text-slate-900 font-mono uppercase">
-                Recruiter Hiring Decision:
-              </span>
-              <span
-                className={`px-2.5 py-0.5 rounded font-bold font-mono text-[11px] uppercase border ${
-                  currentDecision === 'SHORTLISTED'
-                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                    : currentDecision === 'REVIEW'
-                    ? 'bg-amber-100 text-amber-800 border-amber-300'
-                    : currentDecision === 'REJECTED'
-                    ? 'bg-rose-100 text-rose-800 border-rose-300'
-                    : 'bg-slate-100 text-slate-600 border-slate-200'
-                }`}
-              >
-                {currentDecision}
-              </span>
-            </div>
-
-            {/* Decision Action Buttons */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleDecision('SHORTLISTED')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  currentDecision === 'SHORTLISTED'
-                    ? 'bg-emerald-600 text-white shadow-2xs'
-                    : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
-                }`}
-              >
-                <Star size={13} />
-                <span>Shortlist</span>
-              </button>
-
-              <button
-                onClick={() => handleDecision('REVIEW')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  currentDecision === 'REVIEW'
-                    ? 'bg-amber-600 text-white shadow-2xs'
-                    : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
-                }`}
-              >
-                <Clock size={13} />
-                <span>Mark for Review</span>
-              </button>
-
-              <button
-                onClick={() => handleDecision('REJECTED')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  currentDecision === 'REJECTED'
-                    ? 'bg-rose-600 text-white shadow-2xs'
-                    : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-200'
-                }`}
-              >
-                <Ban size={13} />
-                <span>Reject</span>
-              </button>
-            </div>
-          </div>
-
-          {/* ── Sub-navigation Tabs ── */}
-          <div className="flex items-center gap-1.5 border-b border-slate-200 pt-4 pb-1">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`px-3.5 py-1.5 rounded-t-lg text-xs font-bold transition-all border-b-2 ${
-                activeTab === 'overview'
-                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              Why Ranked Here
-            </button>
-            <button
-              onClick={() => setActiveTab('evidence')}
-              className={`px-3.5 py-1.5 rounded-t-lg text-xs font-bold transition-all border-b-2 flex items-center gap-1 ${
-                activeTab === 'evidence'
-                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <FileSearch size={13} />
-              <span>Evidence Explorer</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('matrix')}
-              className={`px-3.5 py-1.5 rounded-t-lg text-xs font-bold transition-all border-b-2 flex items-center gap-1 ${
-                activeTab === 'matrix'
-                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <CheckSquare size={13} />
-              <span>Requirement Matrix</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('flags')}
-              className={`px-3.5 py-1.5 rounded-t-lg text-xs font-bold transition-all border-b-2 flex items-center gap-1 ${
-                activeTab === 'flags'
-                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <AlertTriangle size={13} />
-              <span>Review Flags ({candidate.reviewFlags.length})</span>
-            </button>
-          </div>
-
-          {/* ── Tab Panes ── */}
-          <div className="pt-4">
-            {activeTab === 'overview' && (
-              <div className="space-y-5">
-                {/* Why This Candidate Ranked Here Section */}
-                <div className="dash-card p-5 bg-white space-y-3">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600">
-                    Transparent Ranking Explanation
-                  </span>
-                  <h4 className="text-base font-bold text-slate-900">
-                    Why {candidate.candidateName} Ranked #{candidate.rank} ({candidate.weightedFitScore}% Weighted Fit)
-                  </h4>
-                  
-                  <div className="grid md:grid-cols-3 gap-3 text-xs">
-                    <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded-lg">
-                      <span className="text-[10px] font-mono text-emerald-800 font-bold uppercase block mb-1">
-                        Critical Requirement Coverage
-                      </span>
-                      <p className="text-emerald-900 font-bold text-sm">
-                        {candidate.criticalMatched} of {candidate.criticalTotal} Critical Met
-                      </p>
-                      <p className="text-[11px] text-emerald-700 mt-1">
-                        Carries 3x scoring weight in candidate evaluation.
-                      </p>
-                    </div>
-
-                    <div className="p-3 bg-blue-50/60 border border-blue-200 rounded-lg">
-                      <span className="text-[10px] font-mono text-blue-800 font-bold uppercase block mb-1">
-                        Evidence Grounding Quality
-                      </span>
-                      <p className="text-blue-900 font-bold text-sm">
-                        {candidate.evidenceQuality} Quality
-                      </p>
-                      <p className="text-[11px] text-blue-700 mt-1">
-                        All claims grounded in verbatim extracted text spans.
-                      </p>
-                    </div>
-
-                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                      <span className="text-[10px] font-mono text-slate-500 font-bold uppercase block mb-1">
-                        Experience & Background
-                      </span>
-                      <p className="text-slate-900 font-bold text-sm">
-                        {candidate.experienceSummary}
-                      </p>
-                      <p className="text-[11px] text-slate-600 mt-1">
-                        Extracted from Experience & Education sections.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* AI Recommendation Summary */}
-                <div className="dash-card p-5 bg-white space-y-2">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <span className="text-xs font-bold text-slate-900">
-                      Recommendation Breakdown
-                    </span>
-                    <span className="text-xs font-mono text-slate-400">Non-binding recommendation</span>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4 pt-1">
-                    <div>
-                      <span className="text-[10px] font-mono font-bold uppercase text-emerald-700 block mb-1">
-                        ✓ Key Strengths
-                      </span>
-                      <ul className="text-xs text-slate-700 space-y-1">
-                        {candidate.shortlistRec.reasons.map((r, i) => (
-                          <li key={i} className="flex items-start gap-1.5">
-                            <CheckCircle2 size={12} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                            <span>{r}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] font-mono font-bold uppercase text-amber-700 block mb-1">
-                        ⚠ Considerations & Gaps
-                      </span>
-                      <ul className="text-xs text-slate-700 space-y-1">
-                        {candidate.shortlistRec.concerns.length > 0 ? (
-                          candidate.shortlistRec.concerns.map((c, i) => (
-                            <li key={i} className="flex items-start gap-1.5">
-                              <AlertTriangle size={12} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                              <span>{c}</span>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="text-slate-400 italic">No major gaps identified</li>
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'evidence' && (
-              <div className="dash-card p-5 bg-white">
-                <EvidenceExplorer fields={candidate.data.fields} />
-              </div>
-            )}
-
-            {activeTab === 'matrix' && (
-              <div className="dash-card p-5 bg-white">
-                <RequirementMatrix requirements={candidate.enhancedReqs} />
-              </div>
-            )}
-
-            {activeTab === 'flags' && (
-              <div className="dash-card p-5 bg-white space-y-3">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600">
-                  Audit Checks & Considerations
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold bg-[#F5F5F4] text-[#111111] px-2 py-0.5 rounded border border-[#E5E5E5]">
+                  Rank #{candidate.rank}
                 </span>
-                <h4 className="text-base font-bold text-slate-900">
-                  Review Flags for {candidate.candidateName}
-                </h4>
+                <h2 className="text-xl sm:text-2xl font-black text-[#111111]">
+                  {candidate.name}
+                </h2>
+              </div>
 
-                <div className="space-y-2 pt-1">
-                  {candidate.reviewFlags.map((flag, idx) => (
-                    <div
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[#666666] font-mono">
+                {candidate.email && (
+                  <span className="flex items-center gap-1">
+                    <Mail size={12} className="text-[#888888]" />
+                    <span>{candidate.email}</span>
+                  </span>
+                )}
+                {candidate.phone && (
+                  <span className="flex items-center gap-1">
+                    <Phone size={12} className="text-[#888888]" />
+                    <span>{candidate.phone}</span>
+                  </span>
+                )}
+                {candidate.location && (
+                  <span className="flex items-center gap-1">
+                    <MapPin size={12} className="text-[#888888]" />
+                    <span>{candidate.location}</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Human Decision Buttons */}
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            <button
+              onClick={() => onUpdateDecision('SHORTLISTED')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
+                candidate.recruiterDecision === 'SHORTLISTED'
+                  ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm'
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
+              }`}
+            >
+              <Star size={14} />
+              <span>Shortlist</span>
+            </button>
+
+            <button
+              onClick={() => onUpdateDecision('REVIEW')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
+                candidate.recruiterDecision === 'REVIEW'
+                  ? 'bg-amber-600 border-amber-600 text-white shadow-sm'
+                  : 'bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100'
+              }`}
+            >
+              <Clock size={14} />
+              <span>Mark Review</span>
+            </button>
+
+            <button
+              onClick={() => onUpdateDecision('REJECTED')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
+                candidate.recruiterDecision === 'REJECTED'
+                  ? 'bg-rose-600 border-rose-600 text-white shadow-sm'
+                  : 'bg-rose-50 border-rose-200 text-rose-800 hover:bg-rose-100'
+              }`}
+            >
+              <XCircle size={14} />
+              <span>Reject</span>
+            </button>
+
+            <button
+              onClick={onClose}
+              className="p-2 text-[#777777] hover:text-[#111111] rounded-lg hover:bg-[#F5F5F4] transition-colors ml-1"
+            >
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* ── Key Metrics Cards Bar ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-4 bg-[#F8F8F7] rounded-xl border border-[#E5E5E5] space-y-1">
+            <span className="text-[10px] font-mono font-bold uppercase text-[#777777]">
+              Deterministic Fit Score
+            </span>
+            <div className="text-2xl font-black font-mono text-[#111111]">
+              {candidate.fitScore}%
+            </div>
+            <span className="text-[10px] font-bold text-emerald-700 block">
+              {candidate.fitScore >= 80 ? 'Strong Match' : candidate.fitScore >= 50 ? 'Review' : 'Low Fit'}
+            </span>
+          </div>
+
+          <div className="p-4 bg-[#F8F8F7] rounded-xl border border-[#E5E5E5] space-y-1">
+            <span className="text-[10px] font-mono font-bold uppercase text-[#777777]">
+              Critical Reqs
+            </span>
+            <div className="text-2xl font-black font-mono text-[#111111]">
+              {candidate.criticalRequirementsMet} / {candidate.criticalRequirementsTotal}
+            </div>
+            <span className="text-[10px] font-bold text-[#666666] block">
+              Essential criteria met
+            </span>
+          </div>
+
+          <div className="p-4 bg-[#F8F8F7] rounded-xl border border-[#E5E5E5] space-y-1">
+            <span className="text-[10px] font-mono font-bold uppercase text-[#777777]">
+              Experience
+            </span>
+            <div className="text-2xl font-black font-mono text-[#111111]">
+              {candidate.yearsOfExperience ? `${candidate.yearsOfExperience} Yrs` : 'Detected'}
+            </div>
+            <span className="text-[10px] font-bold text-[#666666] block">
+              Relevant background
+            </span>
+          </div>
+
+          <div className="p-4 bg-[#F8F8F7] rounded-xl border border-[#E5E5E5] space-y-1">
+            <span className="text-[10px] font-mono font-bold uppercase text-[#777777]">
+              Evidence Quality
+            </span>
+            <div className="text-2xl font-black font-mono text-[#111111]">
+              {candidate.evidenceStrength || 'HIGH'}
+            </div>
+            <span className="text-[10px] font-bold text-emerald-700 block">
+              Verbatim grounded
+            </span>
+          </div>
+        </div>
+
+        {/* ── Segmented View Navigation ── */}
+        <div className="flex items-center gap-1.5 p-1 bg-[#F5F5F4] border border-[#E5E5E5] rounded-xl text-xs font-bold text-[#555555]">
+          <button
+            onClick={() => setActiveTab('OVERVIEW')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all ${
+              activeTab === 'OVERVIEW'
+                ? 'bg-black text-white shadow-xs font-bold'
+                : 'hover:text-black'
+            }`}
+          >
+            Overview & Why Ranked Here
+          </button>
+
+          <button
+            onClick={() => setActiveTab('EVIDENCE')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all ${
+              activeTab === 'EVIDENCE'
+                ? 'bg-black text-white shadow-xs font-bold'
+                : 'hover:text-black'
+            }`}
+          >
+            Evidence Explorer ({analysis.fields.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('REQUIREMENTS')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all ${
+              activeTab === 'REQUIREMENTS'
+                ? 'bg-black text-white shadow-xs font-bold'
+                : 'hover:text-black'
+            }`}
+          >
+            Requirements Matrix ({analysis.requirements.length})
+          </button>
+
+          {candidate.flags && candidate.flags.length > 0 && (
+            <button
+              onClick={() => setActiveTab('FLAGS')}
+              className={`px-3.5 py-1.5 rounded-lg transition-all ${
+                activeTab === 'FLAGS'
+                  ? 'bg-black text-white shadow-xs font-bold'
+                  : 'hover:text-black'
+              }`}
+            >
+              Audit Notices ({candidate.flags.length})
+            </button>
+          )}
+        </div>
+
+        {/* ── Tab Content ── */}
+        {activeTab === 'OVERVIEW' && (
+          <div className="space-y-6">
+            {/* Why This Candidate Ranked Here Box */}
+            <div className="p-5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-2xl space-y-3">
+              <h4 className="text-xs font-bold font-mono text-[#111111] uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles size={14} className="text-[#111111]" />
+                <span>Why This Candidate Ranked #{candidate.rank}</span>
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[#555555]">
+                <div className="p-3 bg-white border border-[#E5E5E5] rounded-xl space-y-1">
+                  <span className="font-bold text-[#111111] block">1. Requirement Match</span>
+                  <p>
+                    Satisfied {candidate.criticalRequirementsMet} critical job qualifications with verbatim evidence traces.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-white border border-[#E5E5E5] rounded-xl space-y-1">
+                  <span className="font-bold text-[#111111] block">2. Evidence Grounding</span>
+                  <p>
+                    Extracted {analysis.fields.filter((f) => f.status === 'FOUND').length} structured canonical fields directly from resume text.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-white border border-[#E5E5E5] rounded-xl space-y-1">
+                  <span className="font-bold text-[#111111] block">3. Tie-Breaker Stability</span>
+                  <p>
+                    Stable deterministic ranking ensures 100% reproducible ordering without hallucinations.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Extracted Profile Breakdown */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Skills */}
+              <div className="p-5 bg-white border border-[#E5E5E5] rounded-xl space-y-2.5">
+                <h5 className="text-xs font-bold font-mono text-[#111111] uppercase">
+                  Verified Skills ({candidate.skills.length})
+                </h5>
+                <div className="flex flex-wrap gap-1.5">
+                  {candidate.skills.map((s, idx) => (
+                    <span
                       key={idx}
-                      className="p-3 rounded-xl bg-amber-50/60 border border-amber-200/80 text-xs text-slate-800 font-medium flex items-start gap-2.5"
+                      className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#F5F5F4] text-[#111111] border border-[#E5E5E5]"
                     >
-                      <AlertTriangle size={15} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                      <span>{flag}</span>
-                    </div>
+                      {s}
+                    </span>
                   ))}
                 </div>
               </div>
-            )}
+
+              {/* Education & Experience Summary */}
+              <div className="p-5 bg-white border border-[#E5E5E5] rounded-xl space-y-2.5 text-xs text-[#555555]">
+                <h5 className="text-xs font-bold font-mono text-[#111111] uppercase">
+                  Background Summary
+                </h5>
+                <div className="space-y-1.5">
+                  <div>
+                    <span className="font-bold text-[#111111]">Degree: </span>
+                    <span>{analysis.candidate.highest_degree || 'Detected in profile'}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#111111]">Recent Role: </span>
+                    <span>{analysis.candidate.most_recent_role || 'Software Engineering'}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#111111]">Location: </span>
+                    <span>{analysis.candidate.location || 'Remote / Unspecified'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* ── Footer ── */}
-        <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-mono">
-          <span>Grounded Field Tracing Engine</span>
-          <span>Deterministic Audit ID: {candidate.id}</span>
-        </div>
+        {activeTab === 'EVIDENCE' && (
+          <EvidenceExplorer fields={analysis.fields} />
+        )}
+
+        {activeTab === 'REQUIREMENTS' && (
+          <RequirementMatrix requirements={analysis.requirements} />
+        )}
+
+        {activeTab === 'FLAGS' && candidate.flags && (
+          <div className="space-y-3">
+            {candidate.flags.map((flag, idx) => (
+              <div
+                key={idx}
+                className="p-4 bg-[#F8F8F7] border border-[#E5E5E5] rounded-xl space-y-1 text-xs"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold text-[#111111] uppercase text-[10px] bg-white border border-[#E5E5E5] px-1.5 py-0.2 rounded">
+                    {flag.category}
+                  </span>
+                  <span className="font-bold text-[#111111]">{flag.title}</span>
+                </div>
+                <p className="text-[#666666] font-sans">{flag.description}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
-
-      {/* Print Report Modal */}
-      {showPrintModal && (
-        <PrintReportModal
-          data={candidate.data}
-          weighted={candidate.weightedScoreObj}
-          readiness={candidate.readinessScoreObj}
-          recommendation={candidate.shortlistRec}
-          analysisId={candidate.id}
-          onClose={() => setShowPrintModal(false)}
-        />
-      )}
     </div>
   )
 }

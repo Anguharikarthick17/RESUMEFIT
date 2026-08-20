@@ -1,161 +1,133 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-app: #F8FAFC;
+  --bg-primary: #F8F8F7;
   --bg-card: #FFFFFF;
-  --text-main: #0F172A;
-  --text-muted: #64748B;
-  --border-card: #E5EAF2;
-  --brand-blue: #2563EB;
-  --brand-blue-hover: #1D4ED8;
-  --brand-blue-light: #EFF6FF;
+  --border-color: #E5E5E5;
+  --text-main: #111111;
+  --text-muted: #666666;
+  
+  --brand-black: #000000;
+  --brand-charcoal: #1E1E1E;
+  --brand-charcoal-light: #2A2A2A;
+  
+  --status-matched: #10B981;
+  --status-partial: #F59E0B;
+  --status-missing: #EF4444;
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  body {
+    background-color: #F8F8F7;
+    color: #111111;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-  background-color: #F8FAFC;
-  color: #0F172A;
+/* ── Clean Reusable Design System Tokens ── */
+.app-container {
+  width: min(1400px, calc(100% - 48px));
+  margin-left: auto;
+  margin-right: auto;
 }
 
-body {
-  background-color: #F8FAFC;
-  color: #0F172A;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@media (max-width: 640px) {
+  .app-container {
+    width: calc(100% - 24px);
+  }
 }
 
-/* Scrollbar */
+.dash-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.dash-card:hover {
+  border-color: #D4D4D4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary {
+  background-color: #000000;
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: all 180ms ease;
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+  background-color: #1E1E1E;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: #111111;
+  font-weight: 700;
+  border: 1px solid #E5E5E5;
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all 180ms ease;
+}
+
+.btn-secondary:hover {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-color: #000000;
+  transform: translateY(-1px);
+}
+
+.badge-tag {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid #E5E5E5;
+  background-color: #F8F8F7;
+  color: #111111;
+}
+
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  background: #D4D4D4;
+  border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
-}
-
-/* Global Container Standard: Full-width responsive desktop shell */
-.app-container {
-  width: 100%;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-@media (min-width: 640px) {
-  .app-container {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
-@media (min-width: 1024px) {
-  .app-container {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-
-/* Dashboard Card Standard */
-.dash-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E5EAF2;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 14px rgba(15, 23, 42, 0.025);
-  transition: all 0.2s ease;
-}
-
-.dash-card-hover {
-  background-color: #FFFFFF;
-  border: 1px solid #E5EAF2;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 14px rgba(15, 23, 42, 0.025);
-  transition: all 0.2s ease;
-}
-.dash-card-hover:hover {
-  border-color: #CBD5E1;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
-}
-
-/* Primary Dashboard Button */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #FFFFFF;
-  background-color: #2563EB;
-  border: 1px solid #1D4ED8;
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
-  transition: all 0.15s ease-in-out;
-}
-.btn-primary:hover {
-  background-color: #1D4ED8;
-}
-.btn-primary:active {
-  transform: scale(0.98);
-}
-.btn-primary:disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* Secondary Dashboard Button */
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #334155;
-  background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  transition: all 0.15s ease-in-out;
-}
-.btn-secondary:hover {
-  background-color: #F8FAFC;
-  border-color: #CBD5E1;
-  color: #0F172A;
-}
-
-/* Segmented Pill Tabs */
-.segment-btn-active {
-  background-color: #2563EB;
-  color: #FFFFFF;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
-}
-
-.segment-btn-inactive {
-  background-color: transparent;
-  color: #64748B;
-  font-weight: 500;
-}
-.segment-btn-inactive:hover {
-  color: #0F172A;
-  background-color: #F1F5F9;
+  background: #A3A3A3;
 }

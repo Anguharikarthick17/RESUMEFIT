@@ -45,24 +45,24 @@ export default function CandidateComparisonView({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+      <div className="dash-card p-6 sm:p-8 bg-white flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#E5E5E5] gap-3">
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 font-mono">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] px-2.5 py-0.5 rounded border border-[#E5E5E5]">
             Recruiter Multi-Candidate Intelligence
           </span>
-          <h3 className="text-xl font-bold text-slate-900 mt-0.5">
+          <h3 className="text-xl sm:text-2xl font-black text-[#111111] mt-1">
             Compare Candidates
           </h3>
         </div>
 
-        <div className="text-xs text-slate-500 font-mono">
+        <div className="text-xs text-[#777777] font-mono">
           Side-by-side evidence matrix • Compare up to 3 candidates
         </div>
       </div>
 
       {/* Candidate Selector Badges */}
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        <span className="font-bold text-slate-500 mr-1">Select Candidates:</span>
+        <span className="font-bold text-[#666666] mr-1">Select Candidates:</span>
         {allAvailable.map((c) => {
           const isSelected = selectedIds.includes(c.analysisId)
           return (
@@ -71,8 +71,8 @@ export default function CandidateComparisonView({
               onClick={() => toggleCandidate(c.analysisId)}
               className={`px-3 py-1.5 rounded-lg font-bold border transition-all flex items-center gap-1.5 ${
                 isSelected
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                  : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'
+                  ? 'bg-black text-white border-black shadow-2xs'
+                  : 'bg-white text-[#333333] hover:bg-[#F5F5F4] border-[#E5E5E5]'
               }`}
             >
               <span>{c.candidateName}</span>
@@ -85,26 +85,26 @@ export default function CandidateComparisonView({
       {/* Comparison Matrix Table */}
       <div className="dash-card overflow-hidden bg-white">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs border-collapse">
             {/* Table Header: Candidate Summary Cards */}
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/70">
-                <th className="p-4 font-bold text-slate-400 font-mono uppercase tracking-wider w-1/3 min-w-[220px]">
+              <tr className="border-b border-[#E5E5E5] bg-[#F8F8F7]">
+                <th className="p-4 font-bold text-[#777777] font-mono uppercase tracking-wider w-1/3 min-w-[220px]">
                   Job Requirement
                 </th>
                 {comparedCandidates.map((cand) => (
-                  <th key={cand.analysisId} className="p-4 font-bold text-slate-900 min-w-[180px]">
+                  <th key={cand.analysisId} className="p-4 font-bold text-[#111111] min-w-[180px]">
                     <div className="space-y-1">
                       <div className="text-sm font-black truncate">{cand.candidateName}</div>
                       <div className="flex items-center gap-2">
-                        <span className="text-base font-black font-mono text-blue-600">
+                        <span className="text-base font-black font-mono text-[#111111]">
                           {cand.fitScore}%
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">
+                        <span className="text-[10px] text-[#777777] font-mono">
                           (W: {cand.weightedScore}%)
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-slate-400 block truncate">
+                      <span className="text-[10px] font-mono text-[#777777] block truncate">
                         ID: {cand.analysisId}
                       </span>
                     </div>
@@ -114,10 +114,10 @@ export default function CandidateComparisonView({
             </thead>
 
             {/* Table Body: Requirements Rows */}
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#E5E5E5]">
               {allReqTitles.map((reqTitle) => (
-                <tr key={reqTitle} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="p-4 font-bold text-slate-800 leading-snug">
+                <tr key={reqTitle} className="hover:bg-[#FAFAFA] transition-colors">
+                  <td className="p-4 font-bold text-[#111111] leading-snug">
                     {reqTitle}
                   </td>
 
@@ -145,18 +145,6 @@ export default function CandidateComparisonView({
                   })}
                 </tr>
               ))}
-
-              {/* Summary Stats Row */}
-              <tr className="bg-slate-50/50 font-bold border-t border-slate-200">
-                <td className="p-4 text-slate-900">Summary Alignment</td>
-                {comparedCandidates.map((cand) => (
-                  <td key={cand.analysisId} className="p-4 font-mono text-xs">
-                    <span className="text-emerald-600">{cand.matchedCount}M</span> /{' '}
-                    <span className="text-amber-600">{cand.partialCount}P</span> /{' '}
-                    <span className="text-rose-600">{cand.missingCount}X</span>
-                  </td>
-                ))}
-              </tr>
             </tbody>
           </table>
         </div>

@@ -10,9 +10,9 @@ interface ScreeningAnalyticsViewProps {
 export default function ScreeningAnalyticsView({ jobTitle, candidates }: ScreeningAnalyticsViewProps) {
   const total = candidates.length || 1
 
-  const strongCount = candidates.filter((c) => c.weightedFitScore >= 80).length
-  const reviewCount = candidates.filter((c) => c.weightedFitScore >= 50 && c.weightedFitScore < 80).length
-  const lowCount = candidates.filter((c) => c.weightedFitScore < 50).length
+  const strongCount = candidates.filter((c) => c.fitScore >= 80).length
+  const reviewCount = candidates.filter((c) => c.fitScore >= 50 && c.fitScore < 80).length
+  const lowCount = candidates.filter((c) => c.fitScore < 50).length
   const shortlistedCount = candidates.filter((c) => c.recruiterDecision === 'SHORTLISTED').length
 
   const strongPct = Math.round((strongCount / total) * 100)
@@ -48,17 +48,17 @@ export default function ScreeningAnalyticsView({ jobTitle, candidates }: Screeni
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+      <div className="dash-card p-6 sm:p-8 bg-white flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#E5E5E5] gap-3">
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 font-mono">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] px-2.5 py-0.5 rounded border border-[#E5E5E5] font-mono">
             Talent Pool Intelligence
           </span>
-          <h3 className="text-xl font-bold text-slate-900 mt-0.5">
+          <h3 className="text-xl sm:text-2xl font-black text-[#111111] mt-1">
             Screening Analytics — {jobTitle}
           </h3>
         </div>
 
-        <div className="text-xs text-slate-500 font-mono">
+        <div className="text-xs text-[#777777] font-mono">
           Aggregate analytics across {candidates.length} candidates
         </div>
       </div>
@@ -66,35 +66,35 @@ export default function ScreeningAnalyticsView({ jobTitle, candidates }: Screeni
       {/* Top 4 Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="dash-card p-5 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block mb-1">
+          <span className="text-[10px] font-mono font-bold uppercase text-[#777777] block mb-1">
             CANDIDATE POOL
           </span>
-          <span className="text-2xl font-black text-slate-900">{candidates.length}</span>
-          <span className="text-xs text-slate-500 block mt-1">100% Processed</span>
+          <span className="text-2xl font-black text-[#111111]">{candidates.length}</span>
+          <span className="text-xs text-[#777777] block mt-1">100% Processed</span>
         </div>
 
         <div className="dash-card p-5 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase text-emerald-600 block mb-1">
+          <span className="text-[10px] font-mono font-bold uppercase text-emerald-800 block mb-1">
             STRONG MATCHES
           </span>
-          <span className="text-2xl font-black text-emerald-600">{strongCount} ({strongPct}%)</span>
-          <span className="text-xs text-slate-500 block mt-1">Ready for Interview</span>
+          <span className="text-2xl font-black text-emerald-700">{strongCount} ({strongPct}%)</span>
+          <span className="text-xs text-[#777777] block mt-1">Ready for Interview</span>
         </div>
 
         <div className="dash-card p-5 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase text-amber-600 block mb-1">
-            MARGINAL MATCHES
+          <span className="text-[10px] font-mono font-bold uppercase text-amber-800 block mb-1">
+            NEEDS REVIEW
           </span>
-          <span className="text-2xl font-black text-amber-600">{reviewCount} ({reviewPct}%)</span>
-          <span className="text-xs text-slate-500 block mt-1">Require Manual Review</span>
+          <span className="text-2xl font-black text-amber-700">{reviewCount} ({reviewPct}%)</span>
+          <span className="text-xs text-[#777777] block mt-1">Require Manual Review</span>
         </div>
 
-        <div className="dash-card p-5 bg-blue-50/40 border-blue-200">
-          <span className="text-[10px] font-mono font-bold uppercase text-blue-700 block mb-1">
+        <div className="dash-card p-5 bg-white">
+          <span className="text-[10px] font-mono font-bold uppercase text-[#111111] block mb-1">
             SHORTLISTED
           </span>
-          <span className="text-2xl font-black text-blue-700">{shortlistedCount}</span>
-          <span className="text-xs text-slate-500 block mt-1">Selected by Recruiter</span>
+          <span className="text-2xl font-black text-[#111111]">{shortlistedCount}</span>
+          <span className="text-xs text-[#777777] block mt-1">Selected by Recruiter</span>
         </div>
       </div>
 
@@ -103,51 +103,51 @@ export default function ScreeningAnalyticsView({ jobTitle, candidates }: Screeni
         {/* Left Column: Fit Distribution */}
         <div className="lg:col-span-5 dash-card p-6 bg-white space-y-4">
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase text-slate-400">
+            <span className="text-[10px] font-mono font-bold uppercase text-[#777777]">
               Candidate Quality Breakdown
             </span>
-            <h4 className="text-base font-bold text-slate-900 mt-0.5">
+            <h4 className="text-base font-bold text-[#111111] mt-0.5">
               Fit Score Distribution
             </h4>
           </div>
 
           <div className="space-y-3 pt-2">
             <div>
-              <div className="flex items-center justify-between text-xs font-bold mb-1 text-slate-700">
-                <span className="flex items-center gap-1.5 text-emerald-700">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <div className="flex items-center justify-between text-xs font-bold mb-1 text-[#333333]">
+                <span className="flex items-center gap-1.5 text-emerald-800">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
                   Strong Match (≥80%)
                 </span>
-                <span className="font-mono">{strongCount} ({strongPct}%)</span>
+                <span className="font-mono text-[#111111]">{strongCount} ({strongPct}%)</span>
               </div>
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${strongPct}%` }} />
+              <div className="w-full bg-[#F0F0F0] h-2.5 rounded-full overflow-hidden">
+                <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${strongPct}%` }} />
               </div>
             </div>
 
             <div>
-              <div className="flex items-center justify-between text-xs font-bold mb-1 text-slate-700">
-                <span className="flex items-center gap-1.5 text-amber-700">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <div className="flex items-center justify-between text-xs font-bold mb-1 text-[#333333]">
+                <span className="flex items-center gap-1.5 text-amber-800">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-600" />
                   Needs Review (50–79%)
                 </span>
-                <span className="font-mono">{reviewCount} ({reviewPct}%)</span>
+                <span className="font-mono text-[#111111]">{reviewCount} ({reviewPct}%)</span>
               </div>
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-amber-500 h-full rounded-full" style={{ width: `${reviewPct}%` }} />
+              <div className="w-full bg-[#F0F0F0] h-2.5 rounded-full overflow-hidden">
+                <div className="bg-amber-600 h-full rounded-full" style={{ width: `${reviewPct}%` }} />
               </div>
             </div>
 
             <div>
-              <div className="flex items-center justify-between text-xs font-bold mb-1 text-slate-700">
-                <span className="flex items-center gap-1.5 text-rose-700">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+              <div className="flex items-center justify-between text-xs font-bold mb-1 text-[#333333]">
+                <span className="flex items-center gap-1.5 text-rose-800">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
                   Low Fit (&lt;50%)
                 </span>
-                <span className="font-mono">{lowCount} ({lowPct}%)</span>
+                <span className="font-mono text-[#111111]">{lowCount} ({lowPct}%)</span>
               </div>
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-rose-500 h-full rounded-full" style={{ width: `${lowPct}%` }} />
+              <div className="w-full bg-[#F0F0F0] h-2.5 rounded-full overflow-hidden">
+                <div className="bg-rose-600 h-full rounded-full" style={{ width: `${lowPct}%` }} />
               </div>
             </div>
           </div>
@@ -156,10 +156,10 @@ export default function ScreeningAnalyticsView({ jobTitle, candidates }: Screeni
         {/* Right Column: Requirement Coverage across Pool */}
         <div className="lg:col-span-7 dash-card p-6 bg-white space-y-4">
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase text-slate-400">
+            <span className="text-[10px] font-mono font-bold uppercase text-[#777777]">
               Talent Pool Supply Analysis
             </span>
-            <h4 className="text-base font-bold text-slate-900 mt-0.5">
+            <h4 className="text-base font-bold text-[#111111] mt-0.5">
               Requirement Coverage Across All Resumes
             </h4>
           </div>
@@ -167,20 +167,20 @@ export default function ScreeningAnalyticsView({ jobTitle, candidates }: Screeni
           <div className="space-y-3 pt-2">
             {reqCoverageList.map((item) => (
               <div key={item.requirement} className="space-y-1">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-800">
+                <div className="flex items-center justify-between text-xs font-semibold text-[#111111]">
                   <span className="truncate max-w-[320px]">{item.requirement}</span>
-                  <span className="font-mono font-bold text-blue-600">
+                  <span className="font-mono font-bold text-[#111111]">
                     {item.percentage}% ({item.matchedCount}/{item.totalCount})
                   </span>
                 </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-[#F0F0F0] h-2 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full ${
                       item.percentage >= 75
-                        ? 'bg-blue-600'
+                        ? 'bg-black'
                         : item.percentage >= 50
-                        ? 'bg-amber-500'
-                        : 'bg-rose-500'
+                        ? 'bg-amber-600'
+                        : 'bg-rose-600'
                     }`}
                     style={{ width: `${item.percentage}%` }}
                   />

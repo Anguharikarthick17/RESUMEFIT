@@ -32,9 +32,9 @@ export default function MyMatchesView({
   if (!candidate) {
     return (
       <div className="dash-card p-12 bg-white text-center space-y-4">
-        <Sparkles size={36} className="mx-auto text-blue-600" />
-        <h3 className="text-lg font-black text-slate-900">Upload your resume to discover matches</h3>
-        <p className="text-xs text-slate-500 font-sans max-w-md mx-auto">
+        <Sparkles size={36} className="mx-auto text-[#111111]" />
+        <h3 className="text-lg font-black text-[#111111]">Upload your resume to discover matches</h3>
+        <p className="text-xs text-[#666666] font-sans max-w-md mx-auto">
           Our deterministic AI engine evaluates your resume against all active job requirements to show your top role fits and skill alignments.
         </p>
         <button
@@ -54,47 +54,47 @@ export default function MyMatchesView({
     <div className="space-y-6">
       {/* Header */}
       <div className="dash-card p-6 sm:p-8 bg-white">
-        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] border border-[#E5E5E5] px-2.5 py-0.5 rounded">
           Career Intelligence
         </span>
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-black text-[#111111] mt-1">
           Jobs Matching Your Profile
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 font-sans mt-0.5">
+        <p className="text-xs sm:text-sm text-[#666666] font-sans mt-0.5">
           Personalized role alignment based on your verified resume skills and qualifications.
         </p>
       </div>
 
       {/* Top Highlight Recommendation */}
       {topMatch && topJob && (
-        <div className="dash-card p-6 sm:p-8 bg-gradient-to-br from-white to-blue-50/40 border-2 border-blue-200 space-y-6">
+        <div className="dash-card p-6 sm:p-8 bg-white border-2 border-[#111111] space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-[10px] font-mono font-bold uppercase text-blue-600 bg-blue-100/60 px-2.5 py-0.5 rounded border border-blue-200">
+              <span className="text-[10px] font-mono font-bold uppercase text-[#111111] bg-[#F5F5F4] px-2.5 py-0.5 rounded border border-[#E5E5E5]">
                 #1 Top Recommended Match
               </span>
-              <h2 className="text-2xl font-black text-slate-900">{topJob.title}</h2>
-              <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-                <Building size={13} className="text-slate-400" />
+              <h2 className="text-2xl font-black text-[#111111]">{topJob.title}</h2>
+              <div className="flex items-center gap-2 text-xs text-[#666666] font-medium">
+                <Building size={13} className="text-[#888888]" />
                 <span>{topJob.department || 'Engineering'}</span>
                 <span>•</span>
-                <MapPin size={13} className="text-slate-400" />
+                <MapPin size={13} className="text-[#888888]" />
                 <span>{topJob.location || 'Remote'}</span>
               </div>
             </div>
 
-            <div className="p-4 bg-white rounded-2xl border border-blue-200 text-center space-y-0.5 shadow-xs">
-              <span className="text-3xl font-black text-blue-600 font-mono">
+            <div className="p-4 bg-[#F8F8F7] rounded-2xl border border-[#E5E5E5] text-center space-y-0.5 shadow-xs">
+              <span className="text-3xl font-black text-[#111111] font-mono">
                 {topMatch.fit_score}%
               </span>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
                 Strong Match
               </p>
             </div>
           </div>
 
           {/* Why This Matches You */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-blue-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-[#E5E5E5]">
             <div className="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-2">
               <h4 className="text-xs font-bold font-mono text-emerald-900 uppercase flex items-center gap-1.5">
                 <CheckCircle2 size={14} className="text-emerald-600" />
@@ -103,7 +103,7 @@ export default function MyMatchesView({
               <ul className="text-xs text-emerald-800 space-y-1.5 font-medium">
                 {topMatch.matched_requirements.slice(0, 4).map((r, idx) => (
                   <li key={idx} className="flex items-center gap-1.5">
-                    <span className="text-emerald-500 font-bold">✓</span>
+                    <span className="text-emerald-600 font-bold">✓</span>
                     <span>{r}</span>
                   </li>
                 ))}
@@ -119,12 +119,12 @@ export default function MyMatchesView({
                 {topMatch.missing_requirements.length > 0 ? (
                   topMatch.missing_requirements.slice(0, 3).map((r, idx) => (
                     <li key={idx} className="flex items-center gap-1.5">
-                      <span className="text-rose-500 font-bold">✕</span>
+                      <span className="text-rose-600 font-bold">✕</span>
                       <span>{r}</span>
                     </li>
                   ))
                 ) : (
-                  <li className="text-xs text-emerald-700 font-semibold">
+                  <li className="text-xs text-emerald-800 font-semibold">
                     ✓ All core job requirements satisfied!
                   </li>
                 )}
@@ -147,7 +147,7 @@ export default function MyMatchesView({
       {/* Other Matches Grid */}
       {matches.length > 1 && (
         <div className="space-y-4 pt-4">
-          <h3 className="text-sm font-bold font-mono text-slate-700 uppercase tracking-wider">
+          <h3 className="text-sm font-bold font-mono text-[#111111] uppercase tracking-wider">
             Other Role Matches
           </h3>
 
@@ -159,11 +159,11 @@ export default function MyMatchesView({
               return (
                 <div
                   key={m.job_id}
-                  className="dash-card p-5 bg-white space-y-3 flex flex-col justify-between hover:border-blue-300 transition-all"
+                  className="dash-card p-5 bg-white space-y-3 flex flex-col justify-between hover:border-[#111111] transition-all"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">
+                      <span className="text-[10px] font-mono font-bold text-[#777777] uppercase">
                         {job.department || 'Engineering'}
                       </span>
                       <span
@@ -179,14 +179,14 @@ export default function MyMatchesView({
                       </span>
                     </div>
 
-                    <h4 className="text-base font-bold text-slate-900">{job.title}</h4>
-                    <p className="text-xs text-slate-500 line-clamp-2">{job.job_description}</p>
+                    <h4 className="text-base font-bold text-[#111111]">{job.title}</h4>
+                    <p className="text-xs text-[#666666] line-clamp-2">{job.job_description}</p>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 flex justify-end">
+                  <div className="pt-3 border-t border-[#E5E5E5] flex justify-end">
                     <button
                       onClick={() => onSelectJob(job)}
-                      className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                      className="text-xs font-bold text-[#111111] hover:text-black flex items-center gap-1"
                     >
                       <span>View Details</span>
                       <ArrowRight size={12} />

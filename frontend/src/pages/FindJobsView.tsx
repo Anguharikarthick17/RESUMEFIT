@@ -82,13 +82,13 @@ export default function FindJobsView({
       {/* Hero Banner */}
       <div className="dash-card p-6 sm:p-8 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] border border-[#E5E5E5] px-2.5 py-0.5 rounded">
             Opportunity Marketplace
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#111111] mt-1">
             Find Your Next Opportunity
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 font-sans mt-0.5">
+          <p className="text-xs sm:text-sm text-[#666666] font-sans mt-0.5">
             Discover active job openings ranked by your resume's evidence-backed fit score.
           </p>
         </div>
@@ -107,22 +107,22 @@ export default function FindJobsView({
       {/* Search & Filter Controls */}
       <div className="dash-card p-4 bg-white flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search title, department, skills..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-500 focus:bg-white"
+            className="w-full pl-9 pr-3 py-2 bg-[#F8F8F7] border border-[#E5E5E5] rounded-lg text-xs text-[#111111] placeholder:text-[#888888] outline-none focus:border-black focus:bg-white transition-all"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-0.5 text-xs font-semibold text-slate-600">
+          <div className="flex items-center bg-[#F5F5F4] border border-[#E5E5E5] rounded-lg p-0.5 text-xs font-semibold text-[#555555]">
             <button
               onClick={() => setScoreFilter('ALL')}
               className={`px-2.5 py-1 rounded-md transition-all ${
-                scoreFilter === 'ALL' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
+                scoreFilter === 'ALL' ? 'bg-black text-white shadow-xs font-bold' : 'hover:text-black'
               }`}
             >
               All Jobs
@@ -130,7 +130,7 @@ export default function FindJobsView({
             <button
               onClick={() => setScoreFilter('STRONG')}
               className={`px-2.5 py-1 rounded-md transition-all ${
-                scoreFilter === 'STRONG' ? 'bg-emerald-50 text-emerald-800 shadow-xs' : 'hover:text-slate-900'
+                scoreFilter === 'STRONG' ? 'bg-emerald-50 text-emerald-800 shadow-xs font-bold' : 'hover:text-black'
               }`}
             >
               Strong (≥80%)
@@ -138,7 +138,7 @@ export default function FindJobsView({
             <button
               onClick={() => setScoreFilter('REVIEW')}
               className={`px-2.5 py-1 rounded-md transition-all ${
-                scoreFilter === 'REVIEW' ? 'bg-amber-50 text-amber-800 shadow-xs' : 'hover:text-slate-900'
+                scoreFilter === 'REVIEW' ? 'bg-amber-50 text-amber-800 shadow-xs font-bold' : 'hover:text-black'
               }`}
             >
               Review (50–79%)
@@ -148,7 +148,7 @@ export default function FindJobsView({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none"
+            className="px-3 py-1.5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-lg text-xs font-semibold text-[#111111] outline-none focus:border-black"
           >
             <option value="MATCH">Sort: Best Match</option>
             <option value="NEWEST">Sort: Newest</option>
@@ -160,9 +160,9 @@ export default function FindJobsView({
       {/* Jobs Grid */}
       {filteredJobs.length === 0 ? (
         <div className="dash-card p-12 bg-white text-center space-y-3">
-          <Briefcase size={32} className="mx-auto text-slate-300" />
-          <h4 className="text-base font-bold text-slate-700">No jobs match your search.</h4>
-          <p className="text-xs text-slate-400">Try adjusting your filters or search keywords.</p>
+          <Briefcase size={32} className="mx-auto text-[#CCCCCC]" />
+          <h4 className="text-base font-bold text-[#111111]">No jobs match your search.</h4>
+          <p className="text-xs text-[#777777]">Try adjusting your filters or search keywords.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -173,7 +173,7 @@ export default function FindJobsView({
 
             const badgeColor =
               score === null
-                ? 'bg-slate-50 text-slate-600 border-slate-200'
+                ? 'bg-[#F5F5F4] text-[#777777] border-[#E5E5E5]'
                 : score >= 80
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                 : score >= 50
@@ -192,12 +192,12 @@ export default function FindJobsView({
             return (
               <div
                 key={job.id}
-                className="dash-card p-6 bg-white space-y-4 hover:border-blue-300 transition-all flex flex-col justify-between"
+                className="dash-card p-6 bg-white space-y-4 hover:border-[#111111] transition-all flex flex-col justify-between"
               >
                 <div className="space-y-3">
                   {/* Top Bar: Department & Fit Badge */}
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono text-slate-400 font-bold uppercase flex items-center gap-1.5">
+                    <span className="text-[11px] font-mono text-[#777777] font-bold uppercase flex items-center gap-1.5">
                       <Building size={12} />
                       <span>{job.department || 'Engineering'}</span>
                     </span>
@@ -209,7 +209,7 @@ export default function FindJobsView({
                         <span>{statusText}</span>
                       </div>
                     ) : (
-                      <span className="text-[10px] font-mono text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                      <span className="text-[10px] font-mono text-[#777777] bg-[#F5F5F4] px-2 py-0.5 rounded border border-[#E5E5E5]">
                         Upload resume for fit
                       </span>
                     )}
@@ -217,9 +217,9 @@ export default function FindJobsView({
 
                   {/* Job Title & Location */}
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">{job.title}</h3>
-                    <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mt-0.5">
-                      <MapPin size={12} className="text-slate-400" />
+                    <h3 className="text-lg font-bold text-[#111111]">{job.title}</h3>
+                    <div className="flex items-center gap-2 text-xs text-[#666666] font-medium mt-0.5">
+                      <MapPin size={12} className="text-[#888888]" />
                       <span>{job.location || 'Remote'}</span>
                       <span>•</span>
                       <span>{job.experience_level || 'Mid Level'}</span>
@@ -227,14 +227,14 @@ export default function FindJobsView({
                   </div>
 
                   {/* Description Snippet */}
-                  <p className="text-xs text-slate-600 font-sans line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#666666] font-sans line-clamp-2 leading-relaxed">
                     {job.job_description}
                   </p>
 
                   {/* Requirement Match Highlights */}
                   {match && (
-                    <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                      <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">
+                    <div className="space-y-1.5 pt-2 border-t border-[#E5E5E5]">
+                      <span className="text-[10px] font-mono font-bold uppercase text-[#777777] block">
                         Evidence Highlights
                       </span>
                       <div className="flex flex-wrap gap-1.5">
@@ -262,16 +262,16 @@ export default function FindJobsView({
                 </div>
 
                 {/* Actions */}
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-[#E5E5E5] flex items-center justify-between gap-2">
                   <button
                     onClick={() => onSelectJob(job)}
-                    className="text-xs font-bold text-slate-700 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+                    className="text-xs font-bold text-[#111111] hover:text-black px-3 py-2 rounded-lg hover:bg-[#F5F5F4] transition-colors"
                   >
                     View Job Spec →
                   </button>
 
                   {isApplied ? (
-                    <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                    <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
                       <CheckCircle2 size={13} />
                       <span>Applied</span>
                     </span>

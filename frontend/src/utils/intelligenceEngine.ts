@@ -631,7 +631,34 @@ export const ASSESSMENT_BANK: Record<string, AssessmentQuestion[]> = {
   ],
 }
 
-// ── 11. Local Storage Snapshot Persistence ─────────────────────────────────
+// ── Helper Assessment & Simulation Exports ──────────────────────────────────
+export function getAssessmentQuestions(category: string): AssessmentQuestion[] {
+
+  if (ASSESSMENT_BANK[category]) return ASSESSMENT_BANK[category]
+  const first = Object.keys(ASSESSMENT_BANK)[0]
+  return ASSESSMENT_BANK[first] || []
+}
+
+export function gradeAssessment(category: string, questions: AssessmentQuestion[], userAnswers: number[]): AssessmentResult {
+  let score = 0
+  questions.forEach((q, idx) => {
+    if (userAnswers[idx] === q.correct_index) {
+      score++
+    }
+  })
+  const total = questions.length || 1
+  const percentage = Math.round((score / total) * 100)
+  return {
+    category,
+    score,
+    total,
+    percentage,
+    passed: percentage >= 70,
+  }
+}
+
+export const simulateResumeEnhancement = simulateImprovements
+
 const HISTORY_KEY = 'resumefit_analysis_history_v1'
 
 export function saveAnalysisSnapshot(data: AnalysisResponse, targetRole: string = 'Software Engineer'): AnalysisSnapshot {

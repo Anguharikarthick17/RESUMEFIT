@@ -134,16 +134,16 @@ ${cand.certs}
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
+      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl border border-[#E5E5E5]">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-4 border-b border-[#E5E5E5]">
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] border border-[#E5E5E5] px-2.5 py-0.5 rounded">
               Recruiter Screening Setup
             </span>
-            <h3 className="text-xl font-black text-slate-900 mt-1">
+            <h3 className="text-xl font-black text-[#111111] mt-1">
               New Candidate Screening Session
             </h3>
           </div>
@@ -151,7 +151,7 @@ ${cand.certs}
           <button
             onClick={onClose}
             disabled={isProcessing}
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-1.5 text-[#777777] hover:text-[#111111] rounded-lg hover:bg-[#F5F5F4] transition-colors"
           >
             <X size={18} />
           </button>
@@ -160,31 +160,31 @@ ${cand.certs}
         {/* Processing State */}
         {isProcessing ? (
           <div className="py-12 text-center space-y-5">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200 mx-auto flex items-center justify-center text-blue-600 animate-pulse">
+            <div className="w-14 h-14 rounded-2xl bg-[#F5F5F4] border border-[#E5E5E5] mx-auto flex items-center justify-center text-[#111111] animate-pulse">
               <Sparkles size={28} />
             </div>
 
             <div>
-              <span className="text-xs font-mono font-bold uppercase text-blue-600">
+              <span className="text-xs font-mono font-bold uppercase text-[#111111]">
                 AI Screening in Progress
               </span>
-              <h4 className="text-2xl font-black text-slate-900 mt-1">
+              <h4 className="text-2xl font-black text-[#111111] mt-1">
                 Analyzing {files.length} Candidate Resumes
               </h4>
-              <p className="text-xs text-slate-500 font-mono mt-1">
+              <p className="text-xs text-[#666666] font-mono mt-1">
                 {progressMsg}
               </p>
             </div>
 
             {/* Progress Bar */}
             <div className="max-w-md mx-auto space-y-2">
-              <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200">
+              <div className="w-full bg-[#F5F5F4] h-3 rounded-full overflow-hidden border border-[#E5E5E5]">
                 <div
-                  className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                  className="bg-black h-full rounded-full transition-all duration-300"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
-              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+              <div className="flex items-center justify-between text-[11px] font-mono text-[#777777]">
                 <span>Deterministic Supabase pipeline</span>
                 <span>{progressPct}%</span>
               </div>
@@ -196,7 +196,7 @@ ${cand.certs}
             {/* Step 1: Select / Customize Job Opening */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold font-mono text-slate-700 uppercase">
+                <label className="text-xs font-bold font-mono text-[#111111] uppercase">
                   1. Select Job Opening
                 </label>
                 <div className="flex items-center gap-1.5">
@@ -206,8 +206,8 @@ ${cand.certs}
                       onClick={() => handleSelectExistingJob(j.id)}
                       className={`px-2.5 py-1 rounded text-xs font-semibold border transition-all ${
                         selectedJobId === j.id
-                          ? 'bg-blue-50 border-blue-500 text-blue-800'
-                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                          ? 'bg-black border-black text-white'
+                          : 'bg-white border-[#E5E5E5] text-[#555555] hover:bg-[#F5F5F4]'
                       }`}
                     >
                       {j.title.split(' ')[0]}
@@ -218,67 +218,67 @@ ${cand.certs}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-mono text-slate-400 font-bold block mb-1">
+                  <label className="text-[10px] font-mono text-[#777777] font-bold block mb-1">
                     JOB TITLE
                   </label>
                   <input
                     type="text"
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 outline-none focus:bg-white focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-lg text-xs font-bold text-[#111111] outline-none focus:bg-white focus:border-black"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-mono text-slate-400 font-bold block mb-1">
+                  <label className="text-[10px] font-mono text-[#777777] font-bold block mb-1">
                     EXPERIENCE LEVEL
                   </label>
                   <input
                     type="text"
                     value={experienceLevel}
                     onChange={(e) => setExperienceLevel(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 outline-none focus:bg-white focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-lg text-xs font-medium text-[#111111] outline-none focus:bg-white focus:border-black"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-mono text-slate-400 font-bold block mb-1">
+                <label className="text-[10px] font-mono text-[#777777] font-bold block mb-1">
                   JOB DESCRIPTION REQUIREMENTS
                 </label>
                 <textarea
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                   rows={4}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:bg-white focus:border-blue-500 leading-relaxed font-sans"
+                  className="w-full p-3 bg-[#F8F8F7] border border-[#E5E5E5] rounded-lg text-xs text-[#111111] outline-none focus:bg-white focus:border-black leading-relaxed font-sans"
                 />
               </div>
             </div>
 
             {/* Step 2: Upload Multiple Resumes */}
-            <div className="space-y-3 pt-3 border-t border-slate-100">
+            <div className="space-y-3 pt-3 border-t border-[#E5E5E5]">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold font-mono text-slate-700 uppercase">
+                <label className="text-xs font-bold font-mono text-[#111111] uppercase">
                   2. Upload Candidate Resumes (PDF / DOCX)
                 </label>
 
                 <button
                   type="button"
                   onClick={handleLoadSampleBatch}
-                  className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 border border-blue-200 px-3 py-1 rounded-lg"
+                  className="text-xs font-bold text-[#111111] hover:text-black bg-[#F5F5F4] border border-[#E5E5E5] px-3 py-1 rounded-lg hover:bg-neutral-200/60 transition-colors"
                 >
                   ⚡ Load Sample 6 Candidates
                 </button>
               </div>
 
               {/* Multi-file Dropzone */}
-              <label className="dash-card p-6 border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50/50 hover:bg-blue-50/20 cursor-pointer transition-all flex flex-col items-center justify-center text-center space-y-2 block">
-                <UploadCloud size={28} className="text-slate-400" />
+              <label className="dash-card p-6 border-2 border-dashed border-[#D4D4D4] hover:border-black bg-[#F8F8F7] hover:bg-[#F2F2F2] cursor-pointer transition-all flex flex-col items-center justify-center text-center space-y-2 block">
+                <UploadCloud size={28} className="text-[#777777]" />
                 <div>
-                  <span className="text-xs font-bold text-slate-800">
+                  <span className="text-xs font-bold text-[#111111]">
                     Click to select multiple resume files, or drag and drop
                   </span>
-                  <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                  <p className="text-[11px] text-[#777777] font-mono mt-0.5">
                     Supports PDF & DOCX • Batch size: 1–500 resumes
                   </p>
                 </div>
@@ -294,12 +294,12 @@ ${cand.certs}
               {/* Uploaded Queue List */}
               {files.length > 0 && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs font-mono text-slate-500">
+                  <div className="flex items-center justify-between text-xs font-mono text-[#666666]">
                     <span>Selected Queue: {files.length} resumes</span>
                     <button
                       type="button"
                       onClick={() => setFiles([])}
-                      className="text-rose-600 hover:underline"
+                      className="text-rose-600 hover:underline font-bold"
                     >
                       Clear All
                     </button>
@@ -309,21 +309,21 @@ ${cand.certs}
                     {files.map((file, idx) => (
                       <div
                         key={idx}
-                        className="p-2 bg-white border border-slate-200 rounded-lg flex items-center justify-between text-xs"
+                        className="p-2 bg-white border border-[#E5E5E5] rounded-lg flex items-center justify-between text-xs"
                       >
                         <div className="flex items-center gap-2 truncate">
-                          <FileText size={14} className="text-blue-600 flex-shrink-0" />
-                          <span className="font-semibold text-slate-800 truncate">
+                          <FileText size={14} className="text-[#111111] flex-shrink-0" />
+                          <span className="font-semibold text-[#111111] truncate">
                             {file.name}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-[10px] text-[#777777] font-mono">
                             ({(file.size / 1024).toFixed(0)} KB)
                           </span>
                         </div>
 
                         <button
                           onClick={() => handleRemoveFile(idx)}
-                          className="text-slate-400 hover:text-rose-600 p-1"
+                          className="text-[#888888] hover:text-rose-600 p-1"
                         >
                           <Trash2 size={13} />
                         </button>
@@ -342,8 +342,8 @@ ${cand.certs}
             )}
 
             {/* Action Footer */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-mono">
+            <div className="pt-4 border-t border-[#E5E5E5] flex items-center justify-between">
+              <span className="text-xs text-[#777777] font-mono">
                 Supabase Storage & Database Integration
               </span>
 

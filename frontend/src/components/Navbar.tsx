@@ -43,31 +43,31 @@ export default function Navbar({
   onNewScreening,
 }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E5E5] shadow-xs">
       <div className="app-container flex items-center justify-between h-16">
         
         {/* Brand Logo & Tagline */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-lg shadow-sm">
-            R
+          <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-white font-black text-sm tracking-tighter shadow-sm border border-neutral-800">
+            RF
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-black text-slate-900 text-lg tracking-tight">
+            <div className="flex items-center gap-2">
+              <span className="font-black text-[#111111] text-lg tracking-tight">
                 ResumeFit
               </span>
-              <span className="text-[10px] font-mono font-bold bg-blue-50 text-blue-800 px-2 py-0.2 rounded border border-blue-200">
-                {userMode === 'recruiter' ? 'Recruiter' : 'Candidate'}
+              <span className="text-[10px] font-mono font-bold bg-[#F0F0F0] text-[#111111] px-2 py-0.5 rounded border border-[#E5E5E5]">
+                v1.0
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 font-mono hidden sm:block">
-              See the fit. Verify the evidence.
+            <p className="text-[9px] text-[#666666] font-mono uppercase tracking-wider font-bold hidden sm:block">
+              RECRUITER INTELLIGENCE
             </p>
           </div>
         </div>
 
         {/* Dynamic Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-100/70 p-1 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">
+        <nav className="hidden md:flex items-center gap-1 bg-[#F5F5F4] p-1 rounded-xl border border-[#E5E5E5] text-xs font-semibold text-[#555555]">
           {userMode === 'recruiter' ? (
             /* Recruiter Navigation */
             <>
@@ -75,8 +75,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('dashboard')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'dashboard'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <Briefcase size={14} />
@@ -87,8 +87,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('jobs')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'jobs'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <Briefcase size={14} />
@@ -99,8 +99,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('screening')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'screening'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <Users size={14} />
@@ -111,8 +111,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('analytics')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'analytics'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <BarChart3 size={14} />
@@ -123,8 +123,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('history')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'history'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <History size={14} />
@@ -138,8 +138,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('profile')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'profile'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <UserCheck size={14} />
@@ -150,8 +150,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('find_jobs')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'find_jobs'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <Compass size={14} />
@@ -162,8 +162,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('applications')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'applications'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <FileCheck2 size={14} />
@@ -174,8 +174,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('matches')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'matches'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <TrendingUp size={14} />
@@ -186,8 +186,8 @@ export default function Navbar({
                 onClick={() => onSelectTab('candidate_tools')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                   currentTab === 'candidate_tools'
-                    ? 'bg-white text-blue-900 shadow-xs font-bold'
-                    : 'hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
                 }`}
               >
                 <Sparkles size={14} />
@@ -200,13 +200,13 @@ export default function Navbar({
         {/* Right Section: Mode Toggle & Action */}
         <div className="flex items-center gap-3">
           {/* User Mode Toggle: Recruiter vs Candidate */}
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs font-bold">
+          <div className="flex items-center bg-[#F0F0F0] p-0.5 rounded-xl border border-[#E5E5E5] text-xs font-bold">
             <button
               onClick={() => onToggleMode('recruiter')}
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 userMode === 'recruiter'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-black text-white shadow-xs'
+                  : 'text-[#555555] hover:text-black'
               }`}
             >
               Recruiter
@@ -215,8 +215,8 @@ export default function Navbar({
               onClick={() => onToggleMode('candidate')}
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 userMode === 'candidate'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-black text-white shadow-xs'
+                  : 'text-[#555555] hover:text-black'
               }`}
             >
               Candidate

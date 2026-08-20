@@ -28,23 +28,23 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
           className="dash-card p-6 flex flex-col justify-between h-full"
         >
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1.5">
-                <GraduationCap size={14} className="text-blue-600" />
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E5E5] mb-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#666666] font-mono flex items-center gap-1.5">
+                <GraduationCap size={14} className="text-[#111111]" />
                 Education
               </span>
-              <span className="text-[10px] font-mono text-slate-400">EDUCATION-DEGREE</span>
+              <span className="text-[10px] font-mono text-[#888888]">EDUCATION-DEGREE</span>
             </div>
 
             {fieldMap['EDUCATION-DEGREE']?.status === 'FOUND' && fieldMap['EDUCATION-DEGREE']?.value ? (
-              <p className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+              <p className="text-sm sm:text-base font-bold text-[#111111] leading-snug">
                 {fieldMap['EDUCATION-DEGREE'].value}
               </p>
             ) : (
-              <p className="text-xs sm:text-sm text-slate-400 italic">No degree found in resume</p>
+              <p className="text-xs sm:text-sm text-[#888888] italic">No degree found in resume</p>
             )}
           </div>
-          <div className="text-[10px] font-mono text-emerald-600 mt-4 flex items-center gap-1">
+          <div className="text-[10px] font-mono text-emerald-800 mt-4 flex items-center gap-1">
             <CheckCircle2 size={11} /> Grounded in Education section
           </div>
         </motion.div>
@@ -57,23 +57,23 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
           className="dash-card p-6 flex flex-col justify-between h-full"
         >
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1.5">
-                <Briefcase size={14} className="text-blue-600" />
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E5E5] mb-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#666666] font-mono flex items-center gap-1.5">
+                <Briefcase size={14} className="text-[#111111]" />
                 Recent Experience
               </span>
-              <span className="text-[10px] font-mono text-slate-400">EXPERIENCE-ROLE</span>
+              <span className="text-[10px] font-mono text-[#888888]">EXPERIENCE-ROLE</span>
             </div>
 
             {fieldMap['EXPERIENCE-ROLE']?.status === 'FOUND' && fieldMap['EXPERIENCE-ROLE']?.value ? (
-              <p className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+              <p className="text-sm sm:text-base font-bold text-[#111111] leading-snug">
                 {fieldMap['EXPERIENCE-ROLE'].value}
               </p>
             ) : (
-              <p className="text-xs sm:text-sm text-slate-400 italic">No recent experience found</p>
+              <p className="text-xs sm:text-sm text-[#888888] italic">No recent experience found</p>
             )}
           </div>
-          <div className="text-[10px] font-mono text-slate-400 mt-4">
+          <div className="text-[10px] font-mono text-[#888888] mt-4">
             {fieldMap['EXPERIENCE-ROLE']?.status === 'FOUND' ? 'Extracted from Experience section' : 'Not found in candidate text'}
           </div>
         </motion.div>
@@ -89,38 +89,38 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
           className="dash-card p-6 flex flex-col justify-between h-full"
         >
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1.5">
-                <Mail size={14} className="text-blue-600" />
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E5E5] mb-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#666666] font-mono flex items-center gap-1.5">
+                <Mail size={14} className="text-[#111111]" />
                 Contact Information
               </span>
-              <span className="text-[10px] font-mono text-slate-400">CONTACT</span>
+              <span className="text-[10px] font-mono text-[#888888]">CONTACT</span>
             </div>
 
             <div className="space-y-2.5 text-xs sm:text-sm">
               {candidate.email ? (
-                <div className="flex items-center gap-2 text-slate-700 font-mono truncate">
-                  <Mail size={14} className="text-slate-400 flex-shrink-0" />
-                  <a href={`mailto:${candidate.email}`} className="hover:text-blue-600 truncate">
+                <div className="flex items-center gap-2 text-[#333333] font-mono truncate">
+                  <Mail size={14} className="text-[#888888] flex-shrink-0" />
+                  <a href={`mailto:${candidate.email}`} className="hover:text-black hover:underline truncate">
                     {candidate.email}
                   </a>
                 </div>
               ) : (
-                <div className="text-slate-400 italic">Email: Not found</div>
+                <div className="text-[#888888] italic">Email: Not found</div>
               )}
 
               {candidate.phone ? (
-                <div className="flex items-center gap-2 text-slate-700 font-mono">
-                  <Phone size={14} className="text-slate-400 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-[#333333] font-mono">
+                  <Phone size={14} className="text-[#888888] flex-shrink-0" />
                   <span>{candidate.phone}</span>
                 </div>
               ) : (
-                <div className="text-slate-400 italic">Phone: Not found</div>
+                <div className="text-[#888888] italic">Phone: Not found</div>
               )}
 
               {candidate.linkedin_url && (
-                <div className="flex items-center gap-2 text-blue-600 font-medium truncate">
-                  <ExternalLink size={14} className="text-blue-600 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-[#111111] font-semibold truncate">
+                  <ExternalLink size={14} className="text-[#111111] flex-shrink-0" />
                   <a
                     href={candidate.linkedin_url.startsWith('http') ? candidate.linkedin_url : `https://${candidate.linkedin_url}`}
                     target="_blank"
@@ -133,7 +133,7 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
               )}
             </div>
           </div>
-          <div className="text-[10px] font-mono text-slate-400 mt-4">
+          <div className="text-[10px] font-mono text-[#888888] mt-4">
             Canonical candidate details
           </div>
         </motion.div>
@@ -146,11 +146,11 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
           className="dash-card p-6 flex flex-col justify-between h-full"
         >
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E5E5] mb-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#666666] font-mono">
                 Fit Analysis Breakdown
               </span>
-              <span className="text-xs font-mono font-bold text-slate-700">
+              <span className="text-xs font-mono font-bold text-[#111111]">
                 {fitScore.matched + fitScore.partial + fitScore.missing} Total Reqs
               </span>
             </div>
@@ -159,44 +159,44 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
               {/* Matched bar */}
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                  <span className="text-emerald-700 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" /> Matched
+                  <span className="text-emerald-800 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600" /> Matched
                   </span>
-                  <span className="font-mono text-slate-700">{fitScore.matched} ({matchedPct}%)</span>
+                  <span className="font-mono text-[#111111]">{fitScore.matched} ({matchedPct}%)</span>
                 </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${matchedPct}%` }} />
+                <div className="w-full bg-[#F0F0F0] h-2 rounded-full overflow-hidden">
+                  <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${matchedPct}%` }} />
                 </div>
               </div>
 
               {/* Partial bar */}
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                  <span className="text-amber-700 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-500" /> Partial
+                  <span className="text-amber-800 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-600" /> Partial
                   </span>
-                  <span className="font-mono text-slate-700">{fitScore.partial} ({partialPct}%)</span>
+                  <span className="font-mono text-[#111111]">{fitScore.partial} ({partialPct}%)</span>
                 </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div className="bg-amber-500 h-full rounded-full" style={{ width: `${partialPct}%` }} />
+                <div className="w-full bg-[#F0F0F0] h-2 rounded-full overflow-hidden">
+                  <div className="bg-amber-600 h-full rounded-full" style={{ width: `${partialPct}%` }} />
                 </div>
               </div>
 
               {/* Missing bar */}
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                  <span className="text-rose-700 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-rose-500" /> Missing
+                  <span className="text-rose-800 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-rose-600" /> Missing
                   </span>
-                  <span className="font-mono text-slate-700">{fitScore.missing} ({missingPct}%)</span>
+                  <span className="font-mono text-[#111111]">{fitScore.missing} ({missingPct}%)</span>
                 </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div className="bg-rose-500 h-full rounded-full" style={{ width: `${missingPct}%` }} />
+                <div className="w-full bg-[#F0F0F0] h-2 rounded-full overflow-hidden">
+                  <div className="bg-rose-600 h-full rounded-full" style={{ width: `${missingPct}%` }} />
                 </div>
               </div>
             </div>
           </div>
-          <div className="text-[10px] font-mono text-slate-400 mt-3">
+          <div className="text-[10px] font-mono text-[#888888] mt-3">
             Grounded alignment summary
           </div>
         </motion.div>
@@ -209,12 +209,12 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
         transition={{ delay: 0.2 }}
         className="dash-card p-6"
       >
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono flex items-center gap-2">
-            <Code2 size={15} className="text-blue-600" />
+        <div className="flex items-center justify-between pb-3 border-b border-[#E5E5E5] mb-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[#666666] font-mono flex items-center gap-2">
+            <Code2 size={15} className="text-[#111111]" />
             Skills & Technologies
           </h4>
-          <span className="text-[10px] font-mono text-slate-400">SKILLS-LIST</span>
+          <span className="text-[10px] font-mono text-[#888888]">SKILLS-LIST</span>
         </div>
 
         {fieldMap['SKILLS-LIST']?.status === 'FOUND' && fieldMap['SKILLS-LIST']?.value ? (
@@ -226,14 +226,14 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
               .map(skill => (
                 <span
                   key={skill}
-                  className="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-blue-50 text-blue-800 border border-blue-200/80 shadow-2xs"
+                  className="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-[#F5F5F4] text-[#111111] border border-[#E5E5E5] shadow-2xs"
                 >
                   {skill}
                 </span>
               ))}
           </div>
         ) : (
-          <p className="text-xs sm:text-sm text-slate-400 italic">No skills extracted from resume</p>
+          <p className="text-xs sm:text-sm text-[#888888] italic">No skills extracted from resume</p>
         )}
       </motion.div>
 
@@ -246,26 +246,26 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
           transition={{ delay: 0.25 }}
           className="dash-card p-6"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono flex items-center gap-2">
-              <FolderGit2 size={15} className="text-blue-600" />
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E5E5] mb-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#666666] font-mono flex items-center gap-2">
+              <FolderGit2 size={15} className="text-[#111111]" />
               Key Projects
             </h4>
-            <span className="text-[10px] font-mono text-slate-400">PROJECT-LIST</span>
+            <span className="text-[10px] font-mono text-[#888888]">PROJECT-LIST</span>
           </div>
 
           {fieldMap['PROJECT-LIST']?.status === 'FOUND' && fieldMap['PROJECT-LIST']?.value ? (
             <div className="space-y-3">
               {fieldMap['PROJECT-LIST'].value.split(' | ').map((proj, idx) => (
-                <div key={idx} className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl">
-                  <p className="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
+                <div key={idx} className="p-3.5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-xl">
+                  <p className="text-xs sm:text-sm font-bold text-[#111111] leading-snug">
                     {proj}
                   </p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs sm:text-sm text-slate-400 italic">No projects found in resume</p>
+            <p className="text-xs sm:text-sm text-[#888888] italic">No projects found in resume</p>
           )}
         </motion.div>
 
@@ -276,26 +276,26 @@ export default function CandidateProfileCard({ candidate, fields, fitScore }: Ca
           transition={{ delay: 0.3 }}
           className="dash-card p-6"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono flex items-center gap-2">
-              <Award size={15} className="text-blue-600" />
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E5E5] mb-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#666666] font-mono flex items-center gap-2">
+              <Award size={15} className="text-[#111111]" />
               Certifications
             </h4>
-            <span className="text-[10px] font-mono text-slate-400">CERT-LIST</span>
+            <span className="text-[10px] font-mono text-[#888888]">CERT-LIST</span>
           </div>
 
           {fieldMap['CERT-LIST']?.status === 'FOUND' && fieldMap['CERT-LIST']?.value ? (
             <div className="space-y-3">
               {fieldMap['CERT-LIST'].value.split(' | ').map((cert, idx) => (
-                <div key={idx} className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl">
-                  <p className="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
+                <div key={idx} className="p-3.5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-xl">
+                  <p className="text-xs sm:text-sm font-bold text-[#111111] leading-snug">
                     {cert}
                   </p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs sm:text-sm text-slate-400 italic">No certifications found in resume</p>
+            <p className="text-xs sm:text-sm text-[#888888] italic">No certifications found in resume</p>
           )}
         </motion.div>
       </div>

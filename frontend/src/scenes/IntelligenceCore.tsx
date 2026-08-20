@@ -6,12 +6,12 @@ import { motion } from 'framer-motion'
 
 // ── Pipeline nodes ────────────────────────────────────────────────────────────
 const NODES = [
-  { label: '01 Resume',    angle: 0,   radius: 2.5, color: '#3B82F6', icon: '📄' },
-  { label: '02 Extract',   angle: 60,  radius: 2.5, color: '#2563EB', icon: '⚡' },
-  { label: '03 Segment',   angle: 120, radius: 2.5, color: '#1D4ED8', icon: '📑' },
-  { label: '04 Parse',     angle: 180, radius: 2.5, color: '#0EA5E9', icon: '🔍' },
-  { label: '05 Evidence',  angle: 240, radius: 2.5, color: '#0284C7', icon: '🔗' },
-  { label: '06 Fit Score', angle: 300, radius: 2.5, color: '#10B981', icon: '🎯' },
+  { label: '01 Resume',    angle: 0,   radius: 2.5, color: '#111111', icon: '📄' },
+  { label: '02 Extract',   angle: 60,  radius: 2.5, color: '#262626', icon: '⚡' },
+  { label: '03 Segment',   angle: 120, radius: 2.5, color: '#333333', icon: '📑' },
+  { label: '04 Parse',     angle: 180, radius: 2.5, color: '#444444', icon: '🔍' },
+  { label: '05 Evidence',  angle: 240, radius: 2.5, color: '#10B981', icon: '🔗' },
+  { label: '06 Fit Score', angle: 300, radius: 2.5, color: '#000000', icon: '🎯' },
 ]
 
 function toRad(deg: number) { return (deg * Math.PI) / 180 }
@@ -38,7 +38,7 @@ function CoreSphere() {
       <mesh ref={meshRef}>
         <sphereGeometry args={[0.85, 32, 32]} />
         <meshStandardMaterial
-          color="#EFF6FF"
+          color="#F5F5F4"
           roughness={0.15}
           metalness={0.2}
         />
@@ -47,24 +47,24 @@ function CoreSphere() {
       {/* Wireframe outer shell */}
       <mesh>
         <sphereGeometry args={[0.92, 16, 16]} />
-        <meshBasicMaterial color="#93C5FD" wireframe transparent opacity={0.35} />
+        <meshBasicMaterial color="#CCCCCC" wireframe transparent opacity={0.35} />
       </mesh>
 
       {/* Orbit Ring 1 */}
       <mesh ref={ring1Ref} rotation={[Math.PI / 3, 0, 0]}>
         <torusGeometry args={[1.4, 0.015, 8, 64]} />
-        <meshStandardMaterial color="#3B82F6" metalness={0.5} roughness={0.2} />
+        <meshStandardMaterial color="#111111" metalness={0.5} roughness={0.2} />
       </mesh>
 
       {/* Orbit Ring 2 */}
       <mesh ref={ring2Ref} rotation={[Math.PI / 6, Math.PI / 4, 0]}>
         <torusGeometry args={[1.65, 0.01, 8, 64]} />
-        <meshStandardMaterial color="#60A5FA" transparent opacity={0.6} />
+        <meshStandardMaterial color="#666666" transparent opacity={0.6} />
       </mesh>
 
       {/* Core Center Badge */}
       <Html center distanceFactor={7} style={{ pointerEvents: 'none' }}>
-        <div className="bg-white/95 backdrop-blur-sm border border-brand-200/80 shadow-md px-2.5 py-1 rounded-full text-[10px] font-bold text-brand-700 tracking-wider uppercase select-none whitespace-nowrap">
+        <div className="bg-white/95 backdrop-blur-sm border border-[#E5E5E5] shadow-md px-2.5 py-1 rounded-full text-[10px] font-bold text-[#111111] tracking-wider uppercase select-none whitespace-nowrap">
           ResumeFit Core
         </div>
       </Html>
@@ -105,7 +105,7 @@ function PipelineNode({
       </mesh>
 
       <Html center distanceFactor={9} style={{ pointerEvents: 'none' }}>
-        <div className="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-sm px-2 py-0.5 rounded-md text-[10px] font-medium text-slate-700 whitespace-nowrap select-none mt-6 flex items-center gap-1">
+        <div className="bg-white/95 backdrop-blur-sm border border-[#E5E5E5] shadow-sm px-2 py-0.5 rounded-md text-[10px] font-medium text-[#111111] whitespace-nowrap select-none mt-6 flex items-center gap-1 font-mono">
           <span>{icon}</span>
           <span>{label}</span>
         </div>
@@ -167,7 +167,7 @@ function ParticleField() {
   return (
     <instancedMesh ref={instancedRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[0.014, 4, 4]} />
-      <meshBasicMaterial color="#94A3B8" transparent opacity={0.25} />
+      <meshBasicMaterial color="#AAAAAA" transparent opacity={0.25} />
     </instancedMesh>
   )
 }
@@ -221,7 +221,7 @@ export default function IntelligenceCore({ compact = false }: { compact?: boolea
       >
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 8, 5]} intensity={1.2} color="#ffffff" />
-        <pointLight position={[-4, 2, -2]} intensity={0.6} color="#3B82F6" />
+        <pointLight position={[-4, 2, -2]} intensity={0.6} color="#111111" />
         <SceneGroup />
         {!compact && (
           <OrbitControls

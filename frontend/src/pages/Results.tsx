@@ -139,22 +139,22 @@ export default function Results({ data: initialData, onReset, targetJobDescripti
   const currentTabs = mode === 'candidate' ? CANDIDATE_TABS : RECRUITER_TABS
 
   return (
-    <div className="min-h-screen pt-6 pb-20 bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen pt-6 pb-20 bg-[#F8F8F7] text-[#111111]">
       {/* ── Global 1400px Container ── */}
       <div className="app-container space-y-6">
 
         {/* ── Top Header Bar & Mode Switcher ── */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-4 border-b border-slate-200 gap-4">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-4 border-b border-[#E5E5E5] gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-md">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] border border-[#E5E5E5] px-2.5 py-0.5 rounded-md">
                 Analysis ID: {analysisId}
               </span>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-[#777777] font-mono">
                 {new Date().toLocaleDateString()}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#111111] tracking-tight">
               {mode === 'candidate' ? 'Career Readiness & Job Fit Report' : 'Recruiter Candidate Evaluation'}
             </h1>
           </div>
@@ -162,7 +162,7 @@ export default function Results({ data: initialData, onReset, targetJobDescripti
           {/* Mode Switcher & Global Actions */}
           <div className="flex flex-wrap items-center gap-3">
             {/* Dual Audience Mode Switch */}
-            <div className="p-1 rounded-xl bg-slate-200/80 flex items-center gap-1 text-xs font-bold">
+            <div className="p-1 rounded-xl bg-[#F0F0F0] border border-[#E5E5E5] flex items-center gap-1 text-xs font-bold">
               <button
                 onClick={() => {
                   setMode('candidate')
@@ -170,8 +170,8 @@ export default function Results({ data: initialData, onReset, targetJobDescripti
                 }}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
                   mode === 'candidate'
-                    ? 'bg-white text-blue-600 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs'
+                    : 'text-[#666666] hover:text-black'
                 }`}
               >
                 Candidate View
@@ -183,8 +183,8 @@ export default function Results({ data: initialData, onReset, targetJobDescripti
                 }}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
                   mode === 'recruiter'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-black text-white shadow-xs'
+                    : 'text-[#666666] hover:text-black'
                 }`}
               >
                 Recruiter View
@@ -218,46 +218,46 @@ export default function Results({ data: initialData, onReset, targetJobDescripti
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-center">
             {/* Left: Avatar & Meta */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-extrabold text-2xl flex-shrink-0 shadow-sm">
+              <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center text-white font-extrabold text-2xl flex-shrink-0 shadow-sm border border-neutral-800">
                 {getInitials(data.candidate.full_name)}
               </div>
 
               <div className="space-y-1.5 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#777777]">
                     EVALUATED CANDIDATE
                   </span>
                   {data.candidate.location && (
-                    <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
-                      <MapPin size={12} className="text-slate-400" />
+                    <span className="text-xs text-[#666666] font-medium flex items-center gap-1">
+                      <MapPin size={12} className="text-[#888888]" />
                       {data.candidate.location}
                     </span>
                   )}
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight truncate">
-                  {data.candidate.full_name ?? <span className="text-slate-400 font-normal italic">Name Not Found</span>}
+                <h2 className="text-2xl sm:text-3xl font-black text-[#111111] leading-tight truncate">
+                  {data.candidate.full_name ?? <span className="text-[#888888] font-normal italic">Name Not Found</span>}
                 </h2>
 
-                <p className="text-xs sm:text-sm font-semibold text-slate-600">
+                <p className="text-xs sm:text-sm font-semibold text-[#555555]">
                   {data.candidate.most_recent_role ?? data.candidate.highest_degree ?? 'Extracted Candidate Profile'}
                 </p>
 
                 {/* Contact Chips */}
                 <div className="flex flex-wrap gap-2 pt-1 text-xs">
                   {data.candidate.email && (
-                    <span className="inline-flex items-center gap-1.5 font-mono text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
-                      <Mail size={12} className="text-slate-400" /> {data.candidate.email}
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[#333333] bg-[#F8F8F7] px-2.5 py-1 rounded-md border border-[#E5E5E5]">
+                      <Mail size={12} className="text-[#888888]" /> {data.candidate.email}
                     </span>
                   )}
                   {data.candidate.phone && (
-                    <span className="inline-flex items-center gap-1.5 font-mono text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
-                      <Phone size={12} className="text-slate-400" /> {data.candidate.phone}
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[#333333] bg-[#F8F8F7] px-2.5 py-1 rounded-md border border-[#E5E5E5]">
+                      <Phone size={12} className="text-[#888888]" /> {data.candidate.phone}
                     </span>
                   )}
                   {data.candidate.linkedin_url && (
-                    <span className="inline-flex items-center gap-1.5 font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
-                      <ExternalLink size={12} className="text-blue-600" /> {data.candidate.linkedin_url.replace(/^https?:\/\//, '')}
+                    <span className="inline-flex items-center gap-1.5 font-semibold text-[#111111] bg-[#F5F5F4] px-2.5 py-1 rounded-md border border-[#E5E5E5]">
+                      <ExternalLink size={12} className="text-[#111111]" /> {data.candidate.linkedin_url.replace(/^https?:\/\//, '')}
                     </span>
                   )}
                 </div>
@@ -265,7 +265,7 @@ export default function Results({ data: initialData, onReset, targetJobDescripti
             </div>
 
             {/* Right: Circular Fit Score */}
-            <div className="flex justify-center lg:justify-end border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
+            <div className="flex justify-center lg:justify-end border-t lg:border-t-0 pt-4 lg:pt-0 border-[#E5E5E5]">
               <FitScore data={data.fit_score} />
             </div>
           </div>
@@ -275,194 +275,170 @@ export default function Results({ data: initialData, onReset, targetJobDescripti
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="dash-card p-5 flex flex-col justify-between h-full bg-white">
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#777777] block mb-1">
                 RAW FIT SCORE
               </span>
-              <div className="text-2xl font-black text-slate-900">{data.fit_score.fit_score}%</div>
+              <div className="text-2xl font-black text-[#111111]">{data.fit_score.fit_score}%</div>
             </div>
-            <span className="text-xs text-slate-500 font-sans mt-2 block">
+            <span className="text-xs text-[#777777] font-sans mt-2 block">
               {data.fit_score.matched} of {data.fit_score.total} matched
             </span>
           </div>
 
           <div className="dash-card p-5 flex flex-col justify-between h-full bg-white">
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] block mb-1">
                 WEIGHTED JOB FIT
               </span>
-              <div className="text-2xl font-black text-blue-600">{weighted.weighted_score}%</div>
+              <div className="text-2xl font-black text-[#111111]">{weighted.weighted_score}%</div>
             </div>
-            <span className="text-xs text-slate-500 font-sans mt-2 block">
+            <span className="text-xs text-[#777777] font-sans mt-2 block">
               Critical requirements 3x weight
             </span>
           </div>
 
           <div className="dash-card p-5 flex flex-col justify-between h-full bg-white">
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-800 block mb-1">
                 JOB READINESS
               </span>
-              <div className="text-2xl font-black text-emerald-600">{readiness.overall}%</div>
+              <div className="text-2xl font-black text-emerald-700">{readiness.overall}%</div>
             </div>
-            <span className="text-xs text-slate-500 font-sans mt-2 block">
-              {readiness.label} index
+            <span className="text-xs text-emerald-800 font-sans mt-2 block font-medium">
+              {readiness.tier}
             </span>
           </div>
 
           <div className="dash-card p-5 flex flex-col justify-between h-full bg-white">
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-600 block mb-1">
-                UNMATCHED GAPS
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#777777] block mb-1">
+                REQUIREMENT BREAKDOWN
               </span>
-              <div className="text-2xl font-black text-rose-600">{data.fit_score.missing}</div>
+              <div className="text-2xl font-black text-[#111111]">
+                {data.fit_score.matched} <span className="text-sm font-normal text-[#888888]">/ {data.fit_score.total}</span>
+              </div>
             </div>
-            <span className="text-xs text-slate-500 font-sans mt-2 block">
-              {data.fit_score.partial} partial coverage
+            <span className="text-xs text-[#777777] font-sans mt-2 block">
+              {data.fit_score.partial} partial • {data.fit_score.missing} missing
             </span>
           </div>
         </div>
 
-        {/* ── Segmented Navigation Tabs for Selected Mode ── */}
-        <div className="dash-card p-1.5 bg-slate-100 border-slate-200 overflow-x-auto">
-          <div className="flex items-center gap-1.5 min-w-max">
-            {currentTabs.map((t) => {
-              const isActive = activeTab === t.id
-              const Icon = t.icon
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setActiveTab(t.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                    isActive
-                      ? 'segment-btn-active'
-                      : 'segment-btn-inactive'
-                  }`}
-                >
-                  <Icon size={14} />
-                  <span>{t.label}</span>
-                </button>
-              )
-            })}
-          </div>
+        {/* ── Segmented Navigation Bar ── */}
+        <div className="flex items-center gap-1.5 p-1 bg-[#F5F5F4] border border-[#E5E5E5] rounded-xl overflow-x-auto text-xs font-bold text-[#555555]">
+          {currentTabs.map((tab) => {
+            const Icon = tab.icon
+            const isActive = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 ${
+                  isActive
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'hover:text-black hover:bg-neutral-200/50'
+                }`}
+              >
+                <Icon size={14} />
+                <span>{tab.label}</span>
+              </button>
+            )
+          })}
         </div>
 
-        {/* ── Active Tab Panes ── */}
-        <motion.div
-          key={`${mode}-${activeTab}`}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15 }}
-        >
-          {/* Common: Overview */}
+        {/* ── Dynamic Tab View Content ── */}
+        <div className="pt-2">
           {activeTab === 'overview' && (
-            <CandidateProfileCard candidate={data.candidate} fields={data.fields} fitScore={data.fit_score} />
+            <CandidateProfileCard
+              candidate={data.candidate}
+              fields={data.fields}
+              fitScore={data.fit_score}
+            />
           )}
 
-          {/* Candidate Mode Tabs */}
-          {mode === 'candidate' && activeTab === 'gaps' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <SkillGapView
-                youHave={skillGaps.youHave}
-                partiallyCovered={skillGaps.partiallyCovered}
-                missing={skillGaps.missing}
-              />
-            </div>
+          {activeTab === 'evidence' && (
+            <EvidenceExplorer fields={data.fields} />
           )}
 
-          {mode === 'candidate' && activeTab === 'roadmap' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <LearningRoadmapView
-                roadmap={roadmap}
-                onOpenSimulator={() => setActiveTab('simulator')}
-              />
-            </div>
+          {activeTab === 'requirements' && (
+            <RequirementMatrix requirements={data.requirements} />
           )}
 
-          {mode === 'candidate' && activeTab === 'simulator' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <ImprovementSimulatorView
-                currentFit={data.fit_score.fit_score}
-                allRequirements={data.requirements}
-                options={improvementOptions}
-                onOpenVersions={() => setActiveTab('versions')}
-              />
-            </div>
+          {activeTab === 'gaps' && (
+            <SkillGapView
+              youHave={skillGaps.youHave}
+              partiallyCovered={skillGaps.partiallyCovered}
+              missing={skillGaps.missing}
+            />
           )}
 
-          {mode === 'candidate' && activeTab === 'verify' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <SkillVerificationView
-                extractedSkills={data.fields.find((f) => f.field_id === 'SKILLS-LIST')?.value?.split(',') ?? []}
-              />
-            </div>
+          {activeTab === 'roadmap' && (
+            <LearningRoadmapView
+              roadmap={roadmap}
+              onOpenSimulator={() => setActiveTab('simulator')}
+            />
           )}
 
-          {mode === 'candidate' && activeTab === 'roles' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <RoleFitSimulatorView roles={roleFitResults} />
-            </div>
+          {activeTab === 'simulator' && (
+            <ImprovementSimulatorView
+              initialScore={data.fit_score.fit_score}
+              options={improvementOptions}
+              totalReqs={data.fit_score.total}
+              matchedReqs={data.fit_score.matched}
+              partialReqs={data.fit_score.partial}
+            />
           )}
 
-          {mode === 'candidate' && activeTab === 'versions' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <ResumeVersionComparisonView
-                currentData={data}
-                targetJobDescription={targetJobDescription}
-                onApplyNewVersion={(newData) => setData(newData)}
-              />
-            </div>
+          {activeTab === 'verify' && (
+            <SkillVerificationView
+              skills={data.candidate.skills ?? []}
+            />
           )}
 
-          {mode === 'candidate' && activeTab === 'claims' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <ResumeClaimAnalysisView claims={claimStrength} />
-            </div>
+          {activeTab === 'roles' && (
+            <RoleFitSimulatorView
+              roles={roleFitResults}
+            />
           )}
 
-          {/* Recruiter Mode Tabs */}
-          {mode === 'recruiter' && activeTab === 'evidence' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <EvidenceExplorer fields={data.fields} />
-            </div>
+          {activeTab === 'versions' && (
+            <ResumeVersionComparisonView
+              currentData={data}
+              jobDescription={targetJobDescription}
+            />
           )}
 
-          {mode === 'recruiter' && activeTab === 'requirements' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <RequirementMatrix requirements={enhancedReqs} />
-            </div>
+          {activeTab === 'claims' && (
+            <ResumeClaimAnalysisView
+              claims={claimStrength}
+            />
           )}
 
-          {mode === 'recruiter' && activeTab === 'compare' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <CandidateComparisonView
-                currentSnapshot={currentSnapshot}
-                history={history}
-                onSelectCandidate={handleSelectSnapshot}
-              />
-            </div>
+          {activeTab === 'compare' && (
+            <CandidateComparisonView
+              currentSnapshot={currentSnapshot}
+              history={history}
+              onSelectCandidate={handleSelectSnapshot}
+            />
           )}
 
-          {mode === 'recruiter' && activeTab === 'shortlist' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <ShortlistAssistantView
-                candidate={data.candidate}
-                recommendation={shortlistRec}
-                fitScore={data.fit_score.fit_score}
-                weightedScore={weighted.weighted_score}
-              />
-            </div>
+          {activeTab === 'shortlist' && (
+            <ShortlistAssistantView
+              candidate={data.candidate}
+              recommendation={shortlistRec}
+              fitScore={data.fit_score.fit_score}
+              weightedScore={weighted.weighted_score}
+            />
           )}
 
-          {mode === 'recruiter' && activeTab === 'history' && (
-            <div className="dash-card p-6 sm:p-8 bg-white">
-              <AnalysisHistoryView
-                history={history}
-                onSelect={handleSelectSnapshot}
-                onRefresh={refreshHistory}
-              />
-            </div>
+          {activeTab === 'history' && (
+            <AnalysisHistoryView
+              history={history}
+              onSelect={handleSelectSnapshot}
+              onRefresh={refreshHistory}
+            />
           )}
-        </motion.div>
+        </div>
 
       </div>
 

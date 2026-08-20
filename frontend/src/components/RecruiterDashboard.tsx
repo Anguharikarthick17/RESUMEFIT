@@ -1,15 +1,18 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Briefcase,
-  PlusCircle,
   Users,
-  Star,
   CheckCircle2,
   AlertTriangle,
+  Star,
+  Briefcase,
   ArrowRight,
-  TrendingUp,
-  MapPin,
+  PlusCircle,
   Clock,
+  Sparkles,
+  ShieldCheck,
+  Building,
+  TrendingUp,
 } from 'lucide-react'
 import type { JobOpening } from '../types/recruiter'
 import ResponsibleAINotice from './ResponsibleAINotice'
@@ -27,164 +30,225 @@ export default function RecruiterDashboard({
   onNewScreening,
   onViewCandidates,
 }: RecruiterDashboardProps) {
-  const totalCandidates = jobs.reduce((acc, j) => acc + j.candidates_count, 0)
-  const totalStrongMatches = jobs.reduce((acc, j) => acc + j.strong_matches_count, 0)
-  const totalShortlisted = jobs.reduce((acc, j) => acc + j.shortlisted_count, 0)
-  const totalNeedsReview = totalCandidates - totalStrongMatches - totalShortlisted
+  // Aggregate real numbers across jobs
+  const totalCandidates = jobs.reduce((sum, j) => sum + (j.candidates_count || 0), 0)
+  const totalStrongMatches = jobs.reduce((sum, j) => sum + (j.strong_matches_count || 0), 0)
+  const totalShortlisted = jobs.reduce((sum, j) => sum + (j.shortlisted_count || 0), 0)
+  const totalNeedsReview = Math.max(0, totalCandidates - totalStrongMatches - totalShortlisted)
 
   return (
-    <div className="space-y-6">
-      {/* ── Hero Welcome Banner ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="dash-card p-6 sm:p-8 bg-white"
-      >
-        <div className="grid md:grid-cols-[1fr_auto] gap-6 items-center">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200">
-              <Briefcase size={12} className="text-blue-600" />
-              Recruiter Command Center
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
-              Screen Candidates Faster. Decide With Evidence.
-            </h1>
-
-            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-              ResumeFit compares candidate resumes against job requirements, ranks applicants by deterministic evidence-grounded fit, and empowers recruiters to make confident hiring decisions.
-            </p>
+    <div className="space-y-8">
+      {/* ── 1. Hero / Header Section ── */}
+      <div className="dash-card p-6 sm:p-10 bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] border border-[#E5E5E5]">
+            <Sparkles size={11} className="text-[#111111]" />
+            <span>Recruiter Command Center</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row md:flex-col gap-2.5 flex-shrink-0">
-            <button
-              onClick={onNewScreening}
-              className="btn-primary text-xs sm:text-sm py-2.5 px-5 shadow-sm whitespace-nowrap"
-            >
-              <PlusCircle size={15} />
-              <span>+ New Screening</span>
-            </button>
+          <h1 className="text-2xl sm:text-4xl font-black text-[#111111] tracking-tight">
+            Screen Candidates Faster. <br className="hidden sm:inline" />
+            Decide With Evidence.
+          </h1>
 
-            <button
-              onClick={onViewCandidates}
-              className="btn-secondary text-xs sm:text-sm py-2 px-4 whitespace-nowrap"
-            >
-              <span>View Candidates →</span>
-            </button>
-          </div>
+          <p className="text-xs sm:text-sm text-[#666666] font-sans max-w-2xl leading-relaxed">
+            Evidence-grounded resume intelligence platform for talent teams. Screen hundreds of resumes with verbatim proof, reproducible deterministic ranking, and human-in-the-loop hiring decisions.
+          </p>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-slate-100">
-          <ResponsibleAINotice />
-        </div>
-      </motion.div>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-3 self-start md:self-auto flex-shrink-0">
+          <button
+            onClick={onNewScreening}
+            className="btn-primary text-xs sm:text-sm py-2.5 px-5 shadow-sm"
+          >
+            <PlusCircle size={15} />
+            <span>+ New Screening</span>
+          </button>
 
-      {/* ── 4 Top Recruiter Metrics ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="dash-card p-5 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
-            TOTAL APPLICANTS
-          </span>
-          <div className="text-2xl font-black text-slate-900">{totalCandidates || 124}</div>
-          <span className="text-xs text-slate-500 block mt-1">Across active job openings</span>
-        </div>
-
-        <div className="dash-card p-5 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 block mb-1">
-            STRONG MATCHES
-          </span>
-          <div className="text-2xl font-black text-emerald-600">{totalStrongMatches || 32}</div>
-          <span className="text-xs text-slate-500 block mt-1">Grounded fit ≥ 80%</span>
-        </div>
-
-        <div className="dash-card p-5 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 block mb-1">
-            NEEDS REVIEW
-          </span>
-          <div className="text-2xl font-black text-amber-600">{Math.max(6, totalNeedsReview)}</div>
-          <span className="text-xs text-slate-500 block mt-1">Partial requirement coverage</span>
-        </div>
-
-        <div className="dash-card p-5 bg-blue-50/30 border-blue-200">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-700 block mb-1">
-            SHORTLISTED
-          </span>
-          <div className="text-2xl font-black text-blue-700">{totalShortlisted || 18}</div>
-          <span className="text-xs text-slate-500 block mt-1">Human-approved candidates</span>
+          <button
+            onClick={onViewCandidates}
+            className="btn-secondary text-xs sm:text-sm py-2.5 px-5"
+          >
+            <span>View Candidates →</span>
+          </button>
         </div>
       </div>
 
-      {/* ── Active Job Openings Grid ── */}
+      {/* ── 2. Responsible AI Notice ── */}
+      <ResponsibleAINotice />
+
+      {/* ── 3. Four Core Recruiter Metrics ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Metric 1: Total Applicants */}
+        <div className="dash-card p-5 bg-white space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#777777]">
+              Total Applicants
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-[#F5F5F4] border border-[#E5E5E5] flex items-center justify-center text-[#111111]">
+              <Users size={15} />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-black font-mono text-[#111111]">
+              {totalCandidates}
+            </span>
+            <span className="text-[11px] text-[#666666] font-medium">Processed</span>
+          </div>
+        </div>
+
+        {/* Metric 2: Strong Matches */}
+        <div className="dash-card p-5 bg-white space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#777777]">
+              Strong Matches
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+              <CheckCircle2 size={15} />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-black font-mono text-[#111111]">
+              {totalStrongMatches}
+            </span>
+            <span className="text-[11px] text-emerald-700 font-bold">Fit Score ≥ 80%</span>
+          </div>
+        </div>
+
+        {/* Metric 3: Needs Review */}
+        <div className="dash-card p-5 bg-white space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#777777]">
+              Needs Review
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+              <AlertTriangle size={15} />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-black font-mono text-[#111111]">
+              {totalNeedsReview}
+            </span>
+            <span className="text-[11px] text-amber-700 font-bold">Fit Score 50–79%</span>
+          </div>
+        </div>
+
+        {/* Metric 4: Shortlisted */}
+        <div className="dash-card p-5 bg-white space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#777777]">
+              Shortlisted
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-[#F5F5F4] border border-[#E5E5E5] flex items-center justify-center text-[#111111]">
+              <Star size={15} />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-black font-mono text-[#111111]">
+              {totalShortlisted}
+            </span>
+            <span className="text-[11px] text-[#111111] font-bold">Recruiter Approved</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 4. Active Job Openings Section ── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600">
-              Recruitment Pipeline
-            </span>
-            <h3 className="text-xl font-bold text-slate-900 mt-0.5">
-              Active Job Openings ({jobs.length})
+            <h3 className="text-lg font-bold text-[#111111] tracking-tight">
+              Active Job Openings
             </h3>
+            <p className="text-xs text-[#666666] font-sans">
+              Select a position to review candidate ranking, evidence traces, and hiring recommendations.
+            </p>
           </div>
 
           <button
             onClick={onNewScreening}
-            className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+            className="text-xs font-bold text-[#111111] hover:text-black flex items-center gap-1 hover:underline"
           >
-            <span>+ Create Job</span>
+            <span>+ Create Opening</span>
+            <ArrowRight size={13} />
           </button>
         </div>
 
+        {/* Job Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {jobs.map((job, idx) => (
-            <motion.div
+          {jobs.map((job) => (
+            <div
               key={job.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              className="dash-card p-6 bg-white flex flex-col justify-between h-full space-y-4 hover:border-blue-300 transition-all cursor-pointer"
               onClick={() => onOpenJob(job)}
+              className="dash-card p-6 bg-white space-y-4 cursor-pointer hover:border-[#111111] transition-all flex flex-col justify-between"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
+                {/* Header: Department + Status */}
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                    {job.status}
+                  <span className="text-[10px] font-mono font-bold bg-[#F5F5F4] text-[#111111] px-2 py-0.5 rounded border border-[#E5E5E5]">
+                    {job.status.toUpperCase()}
                   </span>
-                  <span className="text-[11px] text-slate-400 font-mono">
-                    {job.department}
+                  <span className="text-xs text-[#777777] font-mono flex items-center gap-1">
+                    <Building size={12} />
+                    <span>{job.department || 'Engineering'}</span>
                   </span>
                 </div>
 
+                {/* Job Title */}
                 <div>
-                  <h4 className="text-base font-bold text-slate-900 leading-snug hover:text-blue-600">
+                  <h4 className="text-base font-bold text-[#111111] line-clamp-1">
                     {job.title}
                   </h4>
-                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                    <MapPin size={12} className="text-slate-400" />
-                    {job.location}
+                  <p className="text-xs text-[#666666] font-mono mt-0.5">
+                    {job.location || 'Remote'} • {job.experience_level || 'Mid-Senior'}
                   </p>
                 </div>
 
-                <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-1 text-xs">
-                  <div className="flex items-center justify-between text-slate-700">
-                    <span>Candidates Evaluated:</span>
-                    <span className="font-bold font-mono">{job.candidates_count}</span>
+                {/* Description Preview */}
+                <p className="text-xs text-[#666666] font-sans line-clamp-2 leading-relaxed">
+                  {job.job_description}
+                </p>
+
+                {/* Metrics Breakdown */}
+                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#E5E5E5] text-center">
+                  <div className="p-2 bg-[#F8F8F7] rounded-lg">
+                    <span className="text-xs font-mono font-bold text-[#111111] block">
+                      {job.candidates_count || 0}
+                    </span>
+                    <span className="text-[9px] text-[#777777] font-mono uppercase">
+                      Applicants
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between text-emerald-700 font-semibold">
-                    <span>Strong Matches:</span>
-                    <span className="font-mono">{job.strong_matches_count}</span>
+
+                  <div className="p-2 bg-[#F8F8F7] rounded-lg">
+                    <span className="text-xs font-mono font-bold text-emerald-700 block">
+                      {job.strong_matches_count || 0}
+                    </span>
+                    <span className="text-[9px] text-[#777777] font-mono uppercase">
+                      Strong
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between text-blue-700 font-semibold">
-                    <span>Shortlisted:</span>
-                    <span className="font-mono">{job.shortlisted_count}</span>
+
+                  <div className="p-2 bg-[#F8F8F7] rounded-lg">
+                    <span className="text-xs font-mono font-bold text-[#111111] block">
+                      {job.shortlisted_count || 0}
+                    </span>
+                    <span className="text-[9px] text-[#777777] font-mono uppercase">
+                      Shortlist
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
-                <span>Open Screening Results</span>
-                <ArrowRight size={13} />
+              {/* Card Footer */}
+              <div className="pt-3 border-t border-[#E5E5E5] flex items-center justify-between text-xs font-bold text-[#111111]">
+                <span>Screening Queue</span>
+                <span className="flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  <span>Open Results</span>
+                  <ArrowRight size={13} />
+                </span>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

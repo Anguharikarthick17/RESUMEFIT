@@ -1,27 +1,29 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useMemo } from 'react'
+import { motion } from 'framer-motion'
 import {
+  Users,
   Search,
   Filter,
-  Users,
-  Star,
-  Clock,
-  Ban,
   ArrowUpDown,
-  FileSearch,
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  ShieldCheck,
-  Printer,
-  PlusCircle,
+  Star,
+  ExternalLink,
+  Download,
+  Layers,
+  Sparkles,
+  SlidersHorizontal,
   ChevronRight,
+  ShieldAlert,
+  Building,
+  MapPin,
+  ArrowRight,
+  PlusCircle,
 } from 'lucide-react'
 import type { JobOpening, RankedCandidate, RecruiterDecisionStatus } from '../types/recruiter'
 import CandidateDetailModal from './CandidateDetailModal'
 import CandidateComparisonModal from './CandidateComparisonModal'
-import ResponsibleAINotice from './ResponsibleAINotice'
-import { saveRecruiterDecision } from '../utils/recruiterStore'
 
 interface ScreeningResultsViewProps {
   job: JobOpening
@@ -32,442 +34,422 @@ interface ScreeningResultsViewProps {
 
 export default function ScreeningResultsView({
   job,
-  candidates: initialCandidates,
+  candidates,
   onOpenNewScreening,
   onUpdateCandidateDecision,
 }: ScreeningResultsViewProps) {
-  const [candidates, setCandidates] = useState<RankedCandidate[]>(initialCandidates)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [fitFilter, setFitFilter] = useState<'ALL' | 'STRONG' | 'REVIEW' | 'LOW'>('ALL')
-  const [decisionFilter, setDecisionFilter] = useState<'ALL' | 'SHORTLISTED' | 'REVIEW' | 'REJECTED' | 'UNDECIDED'>('ALL')
-  const [sortBy, setSortBy] = useState<'rank' | 'weighted' | 'critical' | 'name'>('rank')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'STRONG' | 'REVIEW' | 'LOW' | 'SHORTLISTED' | 'UNDECIDED'>('ALL')
+  const [sortBy, setSortBy] = useState<'RANK' | 'SCORE' | 'EXPERIENCE' | 'CRITICAL'>('RANK')
 
+  // Selected candidate for deep review modal
+  const [selectedCandidate, setSelectedCandidate] = useState<RankedCandidate | null>(null)
+
+  // Multi-select for side-by-side comparison
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<string[]>([])
-  const [activeCandidateForReview, setActiveCandidateForReview] = useState<RankedCandidate | null>(null)
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false)
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false)
 
-  const handleUpdateDecision = (candidateId: string, decision: RecruiterDecisionStatus) => {
-    saveRecruiterDecision(candidateId, decision)
-    setCandidates((prev) =>
-      prev.map((c) => (c.id === candidateId ? { ...c, recruiterDecision: decision } : c)),
-    )
-    if (activeCandidateForReview && activeCandidateForReview.id === candidateId) {
-      setActiveCandidateForReview((prev) => (prev ? { ...prev, recruiterDecision: decision } : null))
-    }
-    onUpdateCandidateDecision(candidateId, decision)
-  }
+  // Filter and Sort Candidates
+  const filteredCandidates = useMemo(() => {
+    return candidates
+      .filter((c) => {
+        const matchesQuery =
+          c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.skills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()))
+
+        if (!matchesQuery) return false
+
+        if (statusFilter === 'STRONG') return c.fitScore >= 80
+        if (statusFilter === 'REVIEW') return c.fitScore >= 50 && c.fitScore < 80
+        if (statusFilter === 'LOW') return c.fitScore < 50
+        if (statusFilter === 'SHORTLISTED') return c.recruiterDecision === 'SHORTLISTED'
+        if (statusFilter === 'UNDECIDED') return c.recruiterDecision === 'UNDECIDED' || !c.recruiterDecision
+
+        return true
+      })
+      .sort((a, b) => {
+        if (sortBy === 'SCORE') return b.fitScore - a.fitScore
+        if (sortBy === 'CRITICAL') return b.criticalRequirementsMet - a.criticalRequirementsMet
+        if (sortBy === 'EXPERIENCE') return (b.yearsOfExperience || 0) - (a.yearsOfExperience || 0)
+        return a.rank - b.rank
+      })
+  }, [candidates, searchQuery, statusFilter, sortBy])
+
+  // Count summaries
+  const strongCount = candidates.filter((c) => c.fitScore >= 80).length
+  const reviewCount = candidates.filter((c) => c.fitScore >= 50 && c.fitScore < 80).length
+  const lowCount = candidates.filter((c) => c.fitScore < 50).length
+  const shortlistedCount = candidates.filter((c) => c.recruiterDecision === 'SHORTLISTED').length
 
   const toggleSelectCandidate = (id: string) => {
     setSelectedCandidateIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+      prev.includes(id) ? prev.filter((i) => i !== id) : prev.length < 5 ? [...prev, id] : prev,
     )
   }
-
-  const handleSelectAllVisible = (visibleIds: string[]) => {
-    if (selectedCandidateIds.length === visibleIds.length) {
-      setSelectedCandidateIds([])
-    } else {
-      setSelectedCandidateIds(visibleIds)
-    }
-  }
-
-  // Filter and sort candidates
-  const filtered = candidates.filter((c) => {
-    const matchesSearch =
-      c.candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (c.email && c.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (c.experienceSummary && c.experienceSummary.toLowerCase().includes(searchTerm.toLowerCase()))
-
-    const matchesFit =
-      fitFilter === 'ALL'
-        ? true
-        : fitFilter === 'STRONG'
-        ? c.weightedFitScore >= 80
-        : fitFilter === 'REVIEW'
-        ? c.weightedFitScore >= 50 && c.weightedFitScore < 80
-        : c.weightedFitScore < 50
-
-    const matchesDecision =
-      decisionFilter === 'ALL' ? true : c.recruiterDecision === decisionFilter
-
-    return matchesSearch && matchesFit && matchesDecision
-  })
-
-  // Sort
-  filtered.sort((a, b) => {
-    if (sortBy === 'weighted') return b.weightedFitScore - a.weightedFitScore
-    if (sortBy === 'critical') return b.criticalMatched - a.criticalMatched
-    if (sortBy === 'name') return a.candidateName.localeCompare(b.candidateName)
-    return a.rank - b.rank
-  })
-
-  const strongMatchesCount = candidates.filter((c) => c.weightedFitScore >= 80).length
-  const reviewCount = candidates.filter((c) => c.weightedFitScore >= 50 && c.weightedFitScore < 80).length
-  const lowFitCount = candidates.filter((c) => c.weightedFitScore < 50).length
-  const shortlistedCount = candidates.filter((c) => c.recruiterDecision === 'SHORTLISTED').length
 
   const comparedCandidates = candidates.filter((c) => selectedCandidateIds.includes(c.id))
 
   return (
     <div className="space-y-6">
-      {/* ── Top Header & Global Actions ── */}
-      <div className="dash-card p-6 sm:p-8 bg-white space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
-                JOB ID: {job.id}
-              </span>
-              <span className="text-xs text-slate-500 font-medium">
-                {job.department} • {job.location}
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
-              {job.title}
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Screening Dashboard • {candidates.length} candidates evaluated against verified job requirements.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              onClick={onOpenNewScreening}
-              className="btn-primary text-xs py-2.5 px-4 shadow-sm"
-            >
-              <PlusCircle size={14} />
-              <span>+ Add More Resumes</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Responsible AI Notice */}
-        <ResponsibleAINotice />
-      </div>
-
-      {/* ── Metric Cards Row (5 Columns) ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        <div className="dash-card p-4 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
-            TOTAL ANALYZED
-          </span>
-          <span className="text-2xl font-black text-slate-900">{candidates.length}</span>
-          <span className="text-[11px] text-slate-500 block mt-1">100% Grounded</span>
-        </div>
-
-        <div className="dash-card p-4 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 block mb-1">
-            STRONG MATCH
-          </span>
-          <span className="text-2xl font-black text-emerald-600">{strongMatchesCount}</span>
-          <span className="text-[11px] text-slate-500 block mt-1">Score ≥ 80%</span>
-        </div>
-
-        <div className="dash-card p-4 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 block mb-1">
-            NEEDS REVIEW
-          </span>
-          <span className="text-2xl font-black text-amber-600">{reviewCount}</span>
-          <span className="text-[11px] text-slate-500 block mt-1">Score 50–79%</span>
-        </div>
-
-        <div className="dash-card p-4 bg-white">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-600 block mb-1">
-            LOW FIT
-          </span>
-          <span className="text-2xl font-black text-rose-600">{lowFitCount}</span>
-          <span className="text-[11px] text-slate-500 block mt-1">Score &lt; 50%</span>
-        </div>
-
-        <div className="dash-card p-4 bg-white border-blue-200 bg-blue-50/20">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-700 block mb-1">
-            SHORTLISTED
-          </span>
-          <span className="text-2xl font-black text-blue-700">{shortlistedCount}</span>
-          <span className="text-[11px] text-slate-500 block mt-1">Human Choice</span>
-        </div>
-      </div>
-
-      {/* ── Multi-Select Batch Action Floating Bar ── */}
-      {selectedCandidateIds.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-3.5 rounded-xl bg-slate-900 text-white shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-        >
-          <div className="flex items-center gap-2 text-xs">
-            <span className="font-bold font-mono text-blue-400">
-              {selectedCandidateIds.length} candidate(s) selected
+      {/* ── Top Header Card ── */}
+      <div className="dash-card p-6 sm:p-8 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono font-bold bg-[#F5F5F4] text-[#111111] px-2.5 py-0.5 rounded border border-[#E5E5E5]">
+              {job.department || 'Engineering'}
+            </span>
+            <span className="text-xs text-[#777777] font-mono flex items-center gap-1">
+              <MapPin size={12} />
+              <span>{job.location || 'Remote'}</span>
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
-            {selectedCandidateIds.length >= 2 && selectedCandidateIds.length <= 5 && (
-              <button
-                onClick={() => setIsCompareModalOpen(true)}
-                className="btn-primary py-1.5 px-3 text-xs bg-blue-500 hover:bg-blue-600"
-              >
-                <Users size={13} />
-                <span>Compare Selected ({selectedCandidateIds.length})</span>
-              </button>
-            )}
+          <h2 className="text-2xl sm:text-3xl font-black text-[#111111] tracking-tight">
+            {job.title}
+          </h2>
 
-            <button
-              onClick={() => {
-                selectedCandidateIds.forEach((id) => handleUpdateDecision(id, 'SHORTLISTED'))
-              }}
-              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 font-bold transition-all text-xs flex items-center gap-1"
-            >
-              <Star size={12} />
-              <span>Bulk Shortlist</span>
-            </button>
+          <p className="text-xs sm:text-sm text-[#666666] font-sans max-w-3xl line-clamp-1">
+            {job.job_description}
+          </p>
+        </div>
 
+        {/* Action Controls */}
+        <div className="flex items-center gap-2.5 self-start md:self-auto flex-shrink-0">
+          {selectedCandidateIds.length >= 2 && (
             <button
-              onClick={() => setSelectedCandidateIds([])}
-              className="text-slate-400 hover:text-white text-xs px-2"
+              onClick={() => setIsComparisonOpen(true)}
+              className="btn-secondary text-xs py-2 px-3.5 font-bold"
             >
-              Deselect All
+              <Layers size={14} />
+              <span>Compare Selected ({selectedCandidateIds.length})</span>
             </button>
+          )}
+
+          <button
+            onClick={onOpenNewScreening}
+            className="btn-primary text-xs py-2 px-4 shadow-sm font-bold"
+          >
+            <PlusCircle size={14} />
+            <span>+ Screen More Resumes</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── Summary Tiers Bar ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div
+          onClick={() => setStatusFilter('ALL')}
+          className={`dash-card p-4 bg-white cursor-pointer transition-all ${
+            statusFilter === 'ALL' ? 'border-black ring-1 ring-black' : ''
+          }`}
+        >
+          <span className="text-[10px] font-mono font-bold uppercase text-[#777777] block">
+            Total Analyzed
+          </span>
+          <div className="flex items-baseline gap-1.5 mt-0.5">
+            <span className="text-2xl font-black font-mono text-[#111111]">
+              {candidates.length}
+            </span>
+            <span className="text-[10px] text-[#777777] font-medium">candidates</span>
           </div>
-        </motion.div>
-      )}
+        </div>
 
-      {/* ── Search, Filters, and Sorting Bar ── */}
-      <div className="dash-card p-4 bg-white flex flex-col lg:flex-row items-center justify-between gap-3 text-xs">
-        {/* Search */}
-        <div className="relative w-full lg:w-72">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <div
+          onClick={() => setStatusFilter('STRONG')}
+          className={`dash-card p-4 bg-white cursor-pointer transition-all ${
+            statusFilter === 'STRONG' ? 'border-emerald-600 ring-1 ring-emerald-600' : ''
+          }`}
+        >
+          <span className="text-[10px] font-mono font-bold uppercase text-emerald-700 block">
+            Strong Match (≥80%)
+          </span>
+          <div className="flex items-baseline gap-1.5 mt-0.5">
+            <span className="text-2xl font-black font-mono text-[#111111]">
+              {strongCount}
+            </span>
+            <span className="text-[10px] text-emerald-700 font-medium">high fit</span>
+          </div>
+        </div>
+
+        <div
+          onClick={() => setStatusFilter('REVIEW')}
+          className={`dash-card p-4 bg-white cursor-pointer transition-all ${
+            statusFilter === 'REVIEW' ? 'border-amber-600 ring-1 ring-amber-600' : ''
+          }`}
+        >
+          <span className="text-[10px] font-mono font-bold uppercase text-amber-700 block">
+            Needs Review (50–79%)
+          </span>
+          <div className="flex items-baseline gap-1.5 mt-0.5">
+            <span className="text-2xl font-black font-mono text-[#111111]">
+              {reviewCount}
+            </span>
+            <span className="text-[10px] text-amber-700 font-medium">moderate</span>
+          </div>
+        </div>
+
+        <div
+          onClick={() => setStatusFilter('SHORTLISTED')}
+          className={`dash-card p-4 bg-white cursor-pointer transition-all ${
+            statusFilter === 'SHORTLISTED' ? 'border-black ring-1 ring-black' : ''
+          }`}
+        >
+          <span className="text-[10px] font-mono font-bold uppercase text-[#111111] block">
+            Shortlisted (Approved)
+          </span>
+          <div className="flex items-baseline gap-1.5 mt-0.5">
+            <span className="text-2xl font-black font-mono text-[#111111]">
+              {shortlistedCount}
+            </span>
+            <span className="text-[10px] text-[#111111] font-medium">recruiter picked</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Table Filter & Search Controls ── */}
+      <div className="dash-card p-4 bg-white flex flex-col md:flex-row gap-3 items-center justify-between">
+        {/* Search Bar */}
+        <div className="relative w-full md:w-80">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]" />
           <input
             type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search candidate or skill..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:bg-white focus:border-blue-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search candidate name, email, skills..."
+            className="w-full pl-9 pr-3 py-2 bg-[#F8F8F7] border border-[#E5E5E5] rounded-lg text-xs text-[#111111] placeholder:text-[#888888] outline-none focus:border-black focus:bg-white transition-all"
           />
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-          {/* Fit Filter */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+        {/* Filter Pills */}
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <div className="flex items-center bg-[#F5F5F4] border border-[#E5E5E5] rounded-lg p-0.5 text-xs font-semibold text-[#555555]">
             <button
-              onClick={() => setFitFilter('ALL')}
-              className={`px-2.5 py-1 rounded text-[11px] font-bold ${
-                fitFilter === 'ALL' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500'
+              onClick={() => setStatusFilter('ALL')}
+              className={`px-2.5 py-1 rounded-md transition-all ${
+                statusFilter === 'ALL' ? 'bg-black text-white shadow-xs font-bold' : 'hover:text-black'
               }`}
             >
-              All Fit
+              All
             </button>
             <button
-              onClick={() => setFitFilter('STRONG')}
-              className={`px-2.5 py-1 rounded text-[11px] font-bold ${
-                fitFilter === 'STRONG' ? 'bg-white text-emerald-700 shadow-2xs' : 'text-slate-500'
+              onClick={() => setStatusFilter('STRONG')}
+              className={`px-2.5 py-1 rounded-md transition-all ${
+                statusFilter === 'STRONG' ? 'bg-emerald-50 text-emerald-800 shadow-xs font-bold' : 'hover:text-black'
               }`}
             >
-              Strong (≥80%)
+              Strong
             </button>
             <button
-              onClick={() => setFitFilter('REVIEW')}
-              className={`px-2.5 py-1 rounded text-[11px] font-bold ${
-                fitFilter === 'REVIEW' ? 'bg-white text-amber-700 shadow-2xs' : 'text-slate-500'
+              onClick={() => setStatusFilter('REVIEW')}
+              className={`px-2.5 py-1 rounded-md transition-all ${
+                statusFilter === 'REVIEW' ? 'bg-amber-50 text-amber-800 shadow-xs font-bold' : 'hover:text-black'
               }`}
             >
-              Review (50-79%)
+              Review
             </button>
             <button
-              onClick={() => setFitFilter('LOW')}
-              className={`px-2.5 py-1 rounded text-[11px] font-bold ${
-                fitFilter === 'LOW' ? 'bg-white text-rose-700 shadow-2xs' : 'text-slate-500'
+              onClick={() => setStatusFilter('LOW')}
+              className={`px-2.5 py-1 rounded-md transition-all ${
+                statusFilter === 'LOW' ? 'bg-rose-50 text-rose-800 shadow-xs font-bold' : 'hover:text-black'
               }`}
             >
-              Low (&lt;50%)
+              Low Fit
+            </button>
+            <button
+              onClick={() => setStatusFilter('SHORTLISTED')}
+              className={`px-2.5 py-1 rounded-md transition-all ${
+                statusFilter === 'SHORTLISTED' ? 'bg-black text-white shadow-xs font-bold' : 'hover:text-black'
+              }`}
+            >
+              Shortlisted
             </button>
           </div>
 
-          {/* Decision Filter */}
-          <select
-            value={decisionFilter}
-            onChange={(e) => setDecisionFilter(e.target.value as any)}
-            className="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none"
-          >
-            <option value="ALL">All Decisions</option>
-            <option value="SHORTLISTED">⭐ Shortlisted</option>
-            <option value="REVIEW">⏳ Needs Review</option>
-            <option value="REJECTED">✕ Rejected</option>
-            <option value="UNDECIDED">Undecided</option>
-          </select>
-
-          {/* Sort By */}
+          {/* Sort Dropdown */}
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none"
+            className="px-3 py-1.5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-lg text-xs font-semibold text-[#111111] outline-none focus:border-black"
           >
-            <option value="rank">Sort: Rank (Default)</option>
-            <option value="weighted">Sort: Weighted Score</option>
-            <option value="critical">Sort: Critical Requirements</option>
-            <option value="name">Sort: Candidate Name</option>
+            <option value="RANK">Sort: Rank (Best Fit)</option>
+            <option value="SCORE">Sort: Score</option>
+            <option value="CRITICAL">Sort: Critical Reqs Met</option>
+            <option value="EXPERIENCE">Sort: Experience</option>
           </select>
         </div>
       </div>
 
-      {/* ── Main Ranked Candidates Table ── */}
-      <div className="dash-card overflow-hidden bg-white">
+      {/* ── Candidates Data Table ── */}
+      <div className="dash-card bg-white overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-400 font-mono uppercase text-[10px]">
-                <th className="p-3.5 w-10 text-center">
-                  <input
-                    type="checkbox"
-                    checked={filtered.length > 0 && selectedCandidateIds.length === filtered.length}
-                    onChange={() => handleSelectAllVisible(filtered.map((c) => c.id))}
-                    className="rounded text-blue-600"
-                  />
-                </th>
-                <th className="p-3.5 w-16">Rank</th>
-                <th className="p-3.5 min-w-[220px]">Candidate</th>
-                <th className="p-3.5">Fit Score</th>
-                <th className="p-3.5">Critical Reqs</th>
-                <th className="p-3.5 min-w-[180px]">Experience</th>
-                <th className="p-3.5">Evidence</th>
-                <th className="p-3.5">AI Rating</th>
-                <th className="p-3.5 min-w-[140px]">Recruiter Decision</th>
-                <th className="p-3.5 text-right">Action</th>
+              <tr className="bg-[#F8F8F7] text-[#777777] font-mono font-bold border-b border-[#E5E5E5] uppercase text-[10px] tracking-wider">
+                <th className="py-3 px-4 w-12 text-center">Compare</th>
+                <th className="py-3 px-4 w-16">Rank</th>
+                <th className="py-3 px-4">Candidate Profile</th>
+                <th className="py-3 px-4">Fit Score</th>
+                <th className="py-3 px-4">Critical Reqs</th>
+                <th className="py-3 px-4">Experience</th>
+                <th className="py-3 px-4">Evidence</th>
+                <th className="py-3 px-4">AI Rating</th>
+                <th className="py-3 px-4">Recruiter Decision</th>
+                <th className="py-3 px-4 text-right">Action</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-100 font-sans">
-              {filtered.length === 0 ? (
+            <tbody className="divide-y divide-[#E5E5E5]">
+              {filteredCandidates.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="p-8 text-center text-slate-400 italic">
-                    No candidates match the selected filters.
+                  <td colSpan={10} className="py-12 text-center text-[#777777]">
+                    <div className="space-y-2">
+                      <Users size={28} className="mx-auto text-[#AAAAAA]" />
+                      <p className="font-semibold text-sm text-[#111111]">No candidates match the selected filters.</p>
+                      <p className="text-xs text-[#777777]">Try adjusting your search query or status filter.</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                filtered.map((cand) => {
-                  const isSelected = selectedCandidateIds.includes(cand.id)
+                filteredCandidates.map((cand) => {
+                  const isChecked = selectedCandidateIds.includes(cand.id)
+
+                  const fitColor =
+                    cand.fitScore >= 80
+                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                      : cand.fitScore >= 50
+                      ? 'text-amber-700 bg-amber-50 border-amber-200'
+                      : 'text-rose-700 bg-rose-50 border-rose-200'
+
                   return (
                     <tr
                       key={cand.id}
-                      className={`hover:bg-slate-50/80 transition-colors ${
-                        isSelected ? 'bg-blue-50/40' : ''
+                      className={`hover:bg-[#FAFAFA] transition-colors ${
+                        cand.recruiterDecision === 'SHORTLISTED' ? 'bg-[#FDFDFD]' : ''
                       }`}
                     >
-                      <td className="p-3.5 text-center">
+                      {/* Checkbox for batch compare */}
+                      <td className="py-3.5 px-4 text-center">
                         <input
                           type="checkbox"
-                          checked={isSelected}
+                          checked={isChecked}
                           onChange={() => toggleSelectCandidate(cand.id)}
-                          className="rounded text-blue-600"
+                          className="rounded border-[#D4D4D4] text-black focus:ring-black cursor-pointer"
                         />
                       </td>
 
-                      <td className="p-3.5 font-mono font-bold text-slate-500">
+                      {/* Rank */}
+                      <td className="py-3.5 px-4 font-mono font-black text-[#111111] text-sm">
                         #{cand.rank}
                       </td>
 
-                      <td className="p-3.5">
-                        <div className="space-y-0.5">
-                          <button
-                            onClick={() => setActiveCandidateForReview(cand)}
-                            className="font-bold text-slate-900 hover:text-blue-600 text-left truncate block"
+                      {/* Candidate Name & Contact */}
+                      <td className="py-3.5 px-4 space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            onClick={() => setSelectedCandidate(cand)}
+                            className="font-bold text-[#111111] text-sm hover:underline cursor-pointer"
                           >
-                            {cand.candidateName}
-                          </button>
-                          <p className="text-[11px] text-slate-400 font-mono truncate">
-                            {cand.email ?? cand.filename}
-                          </p>
+                            {cand.name}
+                          </span>
+                          {cand.flags && cand.flags.length > 0 && (
+                            <span
+                              title={cand.flags.map((f) => f.title).join('\n')}
+                              className="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-[#F5F5F4] text-[#111111] border border-[#E5E5E5] cursor-help"
+                            >
+                              {cand.flags.length} Audit
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-[#777777] font-mono">
+                          {cand.email || 'No email provided'}
+                        </p>
+                      </td>
+
+                      {/* Fit Score */}
+                      <td className="py-3.5 px-4">
+                        <div className="inline-flex items-center gap-1.5 font-mono font-black text-sm px-2.5 py-1 rounded-md border border-[#E5E5E5] bg-[#F8F8F7] text-[#111111]">
+                          <span>{cand.fitScore}%</span>
                         </div>
                       </td>
 
-                      <td className="p-3.5">
-                        <div className="space-y-0.5">
-                          <span className="text-sm font-black font-mono text-blue-600">
-                            {cand.weightedFitScore}%
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-mono block">
-                            Raw: {cand.rawFitScore}%
-                          </span>
-                        </div>
+                      {/* Critical Requirements Met */}
+                      <td className="py-3.5 px-4 font-mono text-xs">
+                        <span className="font-bold text-[#111111]">
+                          {cand.criticalRequirementsMet} / {cand.criticalRequirementsTotal}
+                        </span>
+                        <span className="text-[10px] text-[#777777] block">Critical met</span>
                       </td>
 
-                      <td className="p-3.5">
-                        <span
-                          className={`font-mono font-bold px-2 py-0.5 rounded text-[11px] border ${
-                            cand.criticalMatched === cand.criticalTotal
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                              : 'bg-amber-50 text-amber-800 border-amber-200'
-                          }`}
-                        >
-                          {cand.criticalMatched}/{cand.criticalTotal} Met
+                      {/* Experience */}
+                      <td className="py-3.5 px-4 space-y-0.5">
+                        <span className="font-semibold text-[#111111] block">
+                          {cand.yearsOfExperience ? `${cand.yearsOfExperience} Years` : 'Detected'}
+                        </span>
+                        <span className="text-[10px] text-[#777777] font-mono truncate max-w-[140px] block">
+                          {cand.currentTitle || 'Professional'}
                         </span>
                       </td>
 
-                      <td className="p-3.5 text-slate-700 truncate max-w-[200px]">
-                        {cand.experienceSummary}
-                      </td>
-
-                      <td className="p-3.5">
+                      {/* Evidence Quality */}
+                      <td className="py-3.5 px-4 font-mono text-xs">
                         <span
-                          className={`font-bold text-[10px] uppercase font-mono ${
-                            cand.evidenceQuality === 'HIGH'
-                              ? 'text-emerald-700'
-                              : cand.evidenceQuality === 'MEDIUM'
-                              ? 'text-blue-700'
-                              : 'text-amber-700'
-                          }`}
-                        >
-                          {cand.evidenceQuality}
-                        </span>
-                      </td>
-
-                      <td className="p-3.5">
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono border ${
-                            cand.aiRecommendation === 'STRONG MATCH'
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                            cand.evidenceStrength === 'STRONG'
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                              : cand.aiRecommendation === 'REVIEW'
+                              : cand.evidenceStrength === 'MODERATE'
                               ? 'bg-amber-50 text-amber-800 border-amber-200'
-                              : 'bg-rose-50 text-rose-800 border-rose-200'
+                              : 'bg-[#F5F5F4] text-[#111111] border-[#E5E5E5]'
                           }`}
                         >
-                          {cand.aiRecommendation}
+                          {cand.evidenceStrength || 'VERIFIED'}
                         </span>
                       </td>
 
-                      {/* Recruiter Human Decision Dropdown */}
-                      <td className="p-3.5">
+                      {/* AI Rating */}
+                      <td className="py-3.5 px-4">
+                        <span
+                          className={`px-2.5 py-1 rounded-md text-[10px] font-mono font-bold border ${fitColor}`}
+                        >
+                          {cand.aiRecommendation || (cand.fitScore >= 80 ? 'STRONG MATCH' : cand.fitScore >= 50 ? 'REVIEW' : 'LOW FIT')}
+                        </span>
+                      </td>
+
+                      {/* Recruiter Decision Dropdown */}
+                      <td className="py-3.5 px-4">
                         <select
-                          value={cand.recruiterDecision}
+                          value={cand.recruiterDecision || 'UNDECIDED'}
                           onChange={(e) =>
-                            handleUpdateDecision(cand.id, e.target.value as RecruiterDecisionStatus)
+                            onUpdateCandidateDecision(
+                              cand.id,
+                              e.target.value as RecruiterDecisionStatus,
+                            )
                           }
-                          className={`px-2 py-1 rounded text-xs font-bold font-mono outline-none border transition-all ${
+                          className={`text-xs font-bold rounded-lg px-2.5 py-1.5 border outline-none cursor-pointer transition-colors ${
                             cand.recruiterDecision === 'SHORTLISTED'
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                              ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
                               : cand.recruiterDecision === 'REVIEW'
-                              ? 'bg-amber-50 text-amber-800 border-amber-300'
+                              ? 'bg-amber-50 text-amber-900 border-amber-300'
                               : cand.recruiterDecision === 'REJECTED'
-                              ? 'bg-rose-50 text-rose-800 border-rose-300'
-                              : 'bg-slate-50 text-slate-600 border-slate-200'
+                              ? 'bg-rose-50 text-rose-900 border-rose-300'
+                              : 'bg-[#F8F8F7] text-[#111111] border-[#E5E5E5]'
                           }`}
                         >
                           <option value="UNDECIDED">Undecided</option>
-                          <option value="SHORTLISTED">⭐ Shortlisted</option>
-                          <option value="REVIEW">⏳ Needs Review</option>
-                          <option value="REJECTED">✕ Rejected</option>
+                          <option value="SHORTLISTED">⭐ Shortlist</option>
+                          <option value="REVIEW">⏳ Review</option>
+                          <option value="REJECTED">✕ Reject</option>
                         </select>
                       </td>
 
-                      {/* Review Action */}
-                      <td className="p-3.5 text-right">
+                      {/* Action Button */}
+                      <td className="py-3.5 px-4 text-right">
                         <button
-                          onClick={() => setActiveCandidateForReview(cand)}
-                          className="btn-secondary py-1 px-2.5 text-xs font-semibold"
+                          onClick={() => setSelectedCandidate(cand)}
+                          className="btn-secondary text-[11px] py-1 px-3 font-bold"
                         >
                           <span>Review</span>
-                          <ChevronRight size={12} />
+                          <ChevronRight size={13} />
                         </button>
                       </td>
                     </tr>
@@ -479,26 +461,24 @@ export default function ScreeningResultsView({
         </div>
       </div>
 
-      {/* ── Candidate Evaluation Detail Modal ── */}
-      {activeCandidateForReview && (
+      {/* ── Candidate Deep Detail Modal ── */}
+      {selectedCandidate && (
         <CandidateDetailModal
-          candidate={activeCandidateForReview}
-          jobTitle={job.title}
-          onClose={() => setActiveCandidateForReview(null)}
-          onUpdateDecision={handleUpdateDecision}
+          candidate={selectedCandidate}
+          jobDescription={job.job_description}
+          onClose={() => setSelectedCandidate(null)}
+          onUpdateDecision={(decision) => {
+            onUpdateCandidateDecision(selectedCandidate.id, decision)
+            setSelectedCandidate((prev) => (prev ? { ...prev, recruiterDecision: decision } : null))
+          }}
         />
       )}
 
-      {/* ── Candidate Comparison Modal ── */}
-      {isCompareModalOpen && comparedCandidates.length >= 2 && (
+      {/* ── Side-by-Side Comparison Modal ── */}
+      {isComparisonOpen && comparedCandidates.length >= 2 && (
         <CandidateComparisonModal
           candidates={comparedCandidates}
-          onClose={() => setIsCompareModalOpen(false)}
-          onSelectCandidate={(c) => {
-            setIsCompareModalOpen(false)
-            setActiveCandidateForReview(c)
-          }}
-          onUpdateDecision={handleUpdateDecision}
+          onClose={() => setIsComparisonOpen(false)}
         />
       )}
     </div>

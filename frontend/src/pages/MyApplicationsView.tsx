@@ -50,7 +50,7 @@ export default function MyApplicationsView({
         )
       default:
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1.5">
+          <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#F5F5F4] text-[#111111] border border-[#E5E5E5] flex items-center gap-1.5">
             <FileCheck2 size={13} />
             <span>Applied</span>
           </span>
@@ -63,13 +63,13 @@ export default function MyApplicationsView({
       {/* Header Card */}
       <div className="dash-card p-6 sm:p-8 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] border border-[#E5E5E5] px-2.5 py-0.5 rounded">
             Application Tracker
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#111111] mt-1">
             My Job Applications ({applications.length})
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 font-sans mt-0.5">
+          <p className="text-xs sm:text-sm text-[#666666] font-sans mt-0.5">
             Track your application status and recruiter reviews in real-time.
           </p>
         </div>
@@ -86,10 +86,10 @@ export default function MyApplicationsView({
       {/* Applications List */}
       {applications.length === 0 ? (
         <div className="dash-card p-12 bg-white text-center space-y-4">
-          <FileCheck2 size={36} className="mx-auto text-slate-300" />
+          <FileCheck2 size={36} className="mx-auto text-[#CCCCCC]" />
           <div>
-            <h4 className="text-base font-bold text-slate-800">No applications submitted yet.</h4>
-            <p className="text-xs text-slate-500 font-sans mt-1">
+            <h4 className="text-base font-bold text-[#111111]">No applications submitted yet.</h4>
+            <p className="text-xs text-[#666666] font-sans mt-1">
               Explore open positions, check your evidence-grounded fit score, and apply in 1-click.
             </p>
           </div>
@@ -105,42 +105,42 @@ export default function MyApplicationsView({
           {applications.map((app) => (
             <div
               key={app.id}
-              className="dash-card p-6 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-blue-300 transition-all"
+              className="dash-card p-6 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-[#111111] transition-all"
             >
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-slate-400 font-bold uppercase flex items-center gap-1">
+                  <span className="text-[11px] font-mono text-[#777777] font-bold uppercase flex items-center gap-1">
                     <Building size={12} />
                     <span>{app.jobs?.department || 'Engineering'}</span>
                   </span>
                   <span>•</span>
-                  <span className="text-[11px] font-mono text-slate-400">
+                  <span className="text-[11px] font-mono text-[#777777]">
                     Applied on {new Date(app.applied_at).toLocaleDateString()}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold text-[#111111]">
                   {app.jobs?.title || 'Job Opening'}
                 </h3>
 
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+                  <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#111111] bg-[#F8F8F7] border border-[#E5E5E5] px-2.5 py-0.5 rounded">
                     <span>Fit Score: {app.fit_score}%</span>
                   </div>
-                  <span className="text-xs text-slate-500 font-medium">
+                  <span className="text-xs text-[#666666] font-medium">
                     {app.jobs?.location || 'Remote'}
                   </span>
                 </div>
               </div>
 
               {/* Status Badge & Action */}
-              <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
+              <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-[#E5E5E5]">
                 {getStatusBadge(app.status)}
 
                 {app.jobs && (
                   <button
                     onClick={() => onViewJobDetail(app.jobs!)}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline"
+                    className="text-xs font-bold text-[#111111] hover:text-black flex items-center gap-1 hover:underline"
                   >
                     <span>View Spec</span>
                     <ExternalLink size={12} />

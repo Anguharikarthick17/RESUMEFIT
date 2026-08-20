@@ -46,6 +46,8 @@ export async function analyzeResume(
   onProgress?: (step: string, progress: number) => void,
   signal?: AbortSignal,
 ): Promise<AnalysisResponse> {
+
+
   onProgress?.('Uploading resume...', 15)
 
   const formData = new FormData()
@@ -341,3 +343,5 @@ export async function persistRecruiterDecision(
     return false
   }
 }
+
+export const analyzeResumeApi = analyzeResume

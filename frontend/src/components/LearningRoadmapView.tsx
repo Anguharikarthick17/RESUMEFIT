@@ -11,12 +11,12 @@ export default function LearningRoadmapView({ roadmap, onOpenSimulator }: Learni
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+      <div className="dash-card p-6 sm:p-8 bg-white flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#E5E5E5] gap-3">
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 font-mono">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] bg-[#F5F5F4] px-2.5 py-0.5 rounded border border-[#E5E5E5]">
             Personalized Career Growth
           </span>
-          <h3 className="text-xl font-bold text-slate-900 mt-0.5">
+          <h3 className="text-xl sm:text-2xl font-black text-[#111111] mt-1">
             Your 30-Day Job Readiness Roadmap
           </h3>
         </div>
@@ -24,7 +24,7 @@ export default function LearningRoadmapView({ roadmap, onOpenSimulator }: Learni
         {onOpenSimulator && (
           <button
             onClick={onOpenSimulator}
-            className="btn-primary text-xs py-2 px-3.5"
+            className="btn-primary text-xs py-2 px-3.5 font-bold shadow-xs"
           >
             <span>Simulate Improvement Impact</span>
             <ArrowRight size={13} />
@@ -40,12 +40,12 @@ export default function LearningRoadmapView({ roadmap, onOpenSimulator }: Learni
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.08 }}
-            className="dash-card p-5 bg-white flex flex-col justify-between h-full space-y-4"
+            className="dash-card p-5 bg-white flex flex-col justify-between h-full space-y-4 hover:border-black transition-all"
           >
             <div className="space-y-3">
               {/* Week & Priority Badge */}
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                <span className="px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-[#F5F5F4] text-[#111111] border border-[#E5E5E5]">
                   WEEK {goal.week}
                 </span>
 
@@ -64,27 +64,27 @@ export default function LearningRoadmapView({ roadmap, onOpenSimulator }: Learni
 
               {/* Title & Target Skill */}
               <div>
-                <h4 className="text-sm font-bold text-slate-900 leading-snug">
+                <h4 className="text-sm font-bold text-[#111111] leading-snug">
                   {goal.title}
                 </h4>
-                <div className="text-xs font-semibold text-blue-600 mt-1 flex items-center gap-1 font-mono">
+                <div className="text-xs font-semibold text-[#111111] mt-1 flex items-center gap-1 font-mono">
                   <Target size={12} /> {goal.skill}
                 </div>
               </div>
 
               {/* Reason / Impact */}
-              <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+              <p className="text-xs text-[#555555] leading-relaxed bg-[#F8F8F7] p-2.5 rounded-lg border border-[#E5E5E5]">
                 {goal.reason}
               </p>
 
               {/* Recommended Focus Checklist */}
               <div className="space-y-1.5 pt-1">
-                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                <span className="text-[10px] font-mono font-bold text-[#777777] uppercase tracking-wider block">
                   Weekly Milestones
                 </span>
                 {goal.recommended_focus.map((focus, fIdx) => (
-                  <div key={fIdx} className="flex items-start gap-1.5 text-xs text-slate-700 font-medium">
-                    <CheckCircle2 size={12} className="text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div key={fIdx} className="flex items-start gap-1.5 text-xs text-[#333333] font-medium">
+                    <CheckCircle2 size={12} className="text-black flex-shrink-0 mt-0.5" />
                     <span>{focus}</span>
                   </div>
                 ))}
@@ -92,11 +92,11 @@ export default function LearningRoadmapView({ roadmap, onOpenSimulator }: Learni
             </div>
 
             {/* Bottom Meta */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+            <div className="pt-3 border-t border-[#E5E5E5] flex items-center justify-between text-[11px] text-[#777777] font-mono">
               <span className="flex items-center gap-1">
                 <Clock size={11} /> {goal.estimated_hours} hrs effort
               </span>
-              <span className="text-emerald-600 font-bold">+Impact</span>
+              <span className="text-emerald-700 font-bold">+Impact</span>
             </div>
           </motion.div>
         ))}
