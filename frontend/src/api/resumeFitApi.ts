@@ -5,7 +5,8 @@ import type { JobOpening, RankedCandidate, RecruiterDecisionStatus } from '../ty
 import type { CandidateAccount, JobApplicationItem, JobMatchItem } from '../types/candidate'
 import { transformAnalysisToRankedCandidate } from '../utils/recruiterStore'
 
-const API_BASE = 'http://localhost:8000'
+const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE || 'http://localhost:8000').replace(/\/$/, '')
+
 
 export interface ScreeningSessionResponse {
   job: JobOpening
