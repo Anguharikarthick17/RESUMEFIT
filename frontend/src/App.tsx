@@ -173,9 +173,24 @@ export default function App() {
       {/* ── Global Header Navigation ── */}
       <Navbar
         currentTab={currentTab}
-        onSelectTab={(tab) => {
+        onSelectTab={async (tab) => {
           setCurrentTab(tab)
           setSelectedJobForDetail(null)
+          if (tab === 'screening') {
+            const targetJob = activeJob || (jobs.length > 0 ? jobs[0] : null)
+            if (targetJob) {
+              setActiveJob(targetJob)
+              try {
+                const cands = await fetchJobCandidates(targetJob.id)
+                setCandidates(cands)
+              } catch (e) {
+                console.error('Error refreshing candidates:', e)
+              }
+            }
+          }
+          if (tab === 'dashboard' || tab === 'jobs') {
+            loadJobsData()
+          }
           window.scrollTo({ top: 0, behavior: 'smooth' })
         }}
         userMode={userMode}

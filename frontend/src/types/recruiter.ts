@@ -22,6 +22,7 @@ export interface RankedCandidate {
   rank: number
   filename: string
   candidateName: string
+  name?: string
   email: string | null
   phone: string | null
   location: string | null
@@ -29,13 +30,21 @@ export interface RankedCandidate {
   mostRecentRole: string | null
   rawFitScore: number
   weightedFitScore: number
+  fitScore?: number
   criticalMatched: number
   criticalTotal: number
+  criticalRequirementsMet?: number
+  criticalRequirementsTotal?: number
   experienceSummary: string
+  yearsOfExperience?: number
+  currentTitle?: string
   evidenceQuality: 'HIGH' | 'MEDIUM' | 'LOW'
+  evidenceStrength?: 'STRONG' | 'MODERATE' | 'LOW'
   aiRecommendation: 'STRONG MATCH' | 'REVIEW' | 'LOW FIT'
   recruiterDecision: RecruiterDecisionStatus
   reviewFlags: string[]
+  flags?: Array<{ title: string; desc?: string }>
+  skills?: string[]
   data: AnalysisResponse
   weightedScoreObj: WeightedFitScore
   readinessScoreObj: JobReadinessScore

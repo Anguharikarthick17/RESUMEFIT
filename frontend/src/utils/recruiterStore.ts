@@ -154,13 +154,15 @@ export function transformAnalysisToRankedCandidate(
   if (enhanced.weighted.weighted_score >= 80) aiRecommendation = 'STRONG MATCH'
   else if (enhanced.weighted.weighted_score < 50) aiRecommendation = 'LOW FIT'
 
-  const recruiterDecision = decisions[candidateId] || 'UNDECIDED'
+  const skillsList = data.candidate.skills ||
+    (data.fields.find((f) => f.field_id === 'SKILLS-LIST')?.value?.split(',').map((s) => s.trim()) || [])
 
   return {
     id: candidateId,
     rank: index + 1,
     filename,
     candidateName: name,
+    name: name,
     email: data.candidate.email,
     phone: data.candidate.phone,
     location: data.candidate.location,
@@ -168,13 +170,20 @@ export function transformAnalysisToRankedCandidate(
     mostRecentRole: data.candidate.most_recent_role,
     rawFitScore: data.fit_score.fit_score,
     weightedFitScore: enhanced.weighted.weighted_score,
+    fitScore: data.fit_score.fit_score,
     criticalMatched: enhanced.weighted.critical_matched,
     criticalTotal: enhanced.weighted.critical_total,
+    criticalRequirementsMet: enhanced.weighted.critical_matched,
+    criticalRequirementsTotal: enhanced.weighted.critical_total,
     experienceSummary: data.candidate.most_recent_role || 'Fresher / Project Experience',
+    currentTitle: data.candidate.most_recent_role || 'Candidate',
     evidenceQuality,
+    evidenceStrength: evidenceQuality === 'HIGH' ? 'STRONG' : evidenceQuality === 'MEDIUM' ? 'MODERATE' : 'LOW',
     aiRecommendation,
     recruiterDecision,
     reviewFlags,
+    flags: reviewFlags.map((rf) => ({ title: rf })),
+    skills: skillsList,
     data,
     weightedScoreObj: enhanced.weighted,
     readinessScoreObj: readiness,

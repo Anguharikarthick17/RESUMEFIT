@@ -283,21 +283,32 @@ export async function fetchJobCandidates(jobId: string): Promise<RankedCandidate
     const data: any[] = await res.json()
 
     return data.map((item, idx) => {
+      const candObj = item.candidates || item.candidate || {}
+      const candName = candObj.name || item.candidate_name || 'Candidate'
+      
+      const evidenceFields = Array.isArray(item.evidence) ? item.evidence : []
+      const reqList = Array.isArray(item.requirements) ? item.requirements : []
+
+      const skillsField = evidenceFields.find((f: any) => f.field_id === 'SKILLS-LIST')
+      const extractedSkills = candObj.skills ||
+        (skillsField?.value ? skillsField.value.split(',').map((s: string) => s.trim()) : [])
+
       const analysisResp: AnalysisResponse = {
         candidate: {
-          full_name: item.candidates?.name || 'Candidate',
-          email: item.candidates?.email,
-          phone: item.candidates?.phone,
-          location: item.candidates?.location,
-          linkedin_url: item.candidates?.linkedin_url,
-          highest_degree: item.candidates?.summary,
-          most_recent_role: item.candidates?.summary,
+          full_name: candName,
+          email: candObj.email || null,
+          phone: candObj.phone || null,
+          location: candObj.location || null,
+          linkedin_url: candObj.linkedin_url || null,
+          highest_degree: candObj.highest_degree || candObj.summary || null,
+          most_recent_role: candObj.most_recent_role || candObj.summary || null,
+          skills: extractedSkills,
         },
-        fields: item.evidence || [],
+        fields: evidenceFields,
         sections_found: [],
-        requirements: item.requirements || [],
+        requirements: reqList,
         fit_score: {
-          fit_score: item.fit_score || 0,
+          fit_score: typeof item.fit_score === 'number' ? item.fit_score : 0,
           score_label: item.status === 'strong_match' ? 'Strong Match' : 'Needs Review',
           matched: item.matched_count || 0,
           partial: item.partial_count || 0,
@@ -307,15 +318,16 @@ export async function fetchJobCandidates(jobId: string): Promise<RankedCandidate
         errors: [],
       }
 
-      const r = transformAnalysisToRankedCandidate(item.candidates?.name || 'Candidate', analysisResp, idx)
-      r.id = item.id
+      const r = transformAnalysisToRankedCandidate(candName, analysisResp, idx)
+      r.id = item.id || `res-${idx}`
       r.rank = item.rank || idx + 1
       if (item.recruiter_decisions?.decision) {
         r.recruiterDecision = item.recruiter_decisions.decision.toUpperCase() as RecruiterDecisionStatus
       }
       return r
     })
-  } catch {
+  } catch (err) {
+    console.error('Error fetching job candidates:', err)
     return []
   }
 }

@@ -42,11 +42,27 @@ export default function CandidateDetailModal({
 }: CandidateDetailModalProps) {
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'EVIDENCE' | 'REQUIREMENTS' | 'FLAGS'>('OVERVIEW')
 
-  const analysis = candidate.data
+  const analysis = candidate.data || {
+    candidate: {},
+    fields: [],
+    requirements: [],
+    fit_score: { fit_score: 0, matched: 0, partial: 0, missing: 0, total: 0 },
+  }
+
+  const name = (candidate.candidateName || candidate.name || analysis.candidate?.full_name || 'Candidate').trim()
+  const email = candidate.email || analysis.candidate?.email || null
+  const phone = candidate.phone || analysis.candidate?.phone || null
+  const location = candidate.location || analysis.candidate?.location || null
+  const score = typeof candidate.weightedFitScore === 'number' ? candidate.weightedFitScore : typeof candidate.rawFitScore === 'number' ? candidate.rawFitScore : candidate.fitScore ?? (analysis.fit_score?.fit_score || 0)
+  const critMet = candidate.criticalMatched ?? candidate.criticalRequirementsMet ?? (analysis.fit_score?.matched || 0)
+  const critTotal = candidate.criticalTotal ?? candidate.criticalRequirementsTotal ?? (analysis.fit_score?.total || 1)
+  const skillsList = Array.isArray(candidate.skills) ? candidate.skills : Array.isArray(analysis.candidate?.skills) ? analysis.candidate.skills : []
+  const decision = candidate.recruiterDecision || 'UNDECIDED'
+
   const fitColor =
-    candidate.fitScore >= 80
+    score >= 80
       ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-      : candidate.fitScore >= 50
+      : score >= 50
       ? 'text-amber-700 bg-amber-50 border-amber-200'
       : 'text-rose-700 bg-rose-50 border-rose-200'
 
@@ -58,36 +74,36 @@ export default function CandidateDetailModal({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#E5E5E5]">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-black text-white font-black text-xl flex items-center justify-center border border-neutral-800">
-              {candidate.name.charAt(0)}
+              {name.charAt(0).toUpperCase()}
             </div>
 
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-mono font-bold bg-[#F5F5F4] text-[#111111] px-2 py-0.5 rounded border border-[#E5E5E5]">
-                  Rank #{candidate.rank}
+                  Rank #{candidate.rank || 1}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black text-[#111111]">
-                  {candidate.name}
+                  {name}
                 </h2>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 text-xs text-[#666666] font-mono">
-                {candidate.email && (
+                {email && (
                   <span className="flex items-center gap-1">
                     <Mail size={12} className="text-[#888888]" />
-                    <span>{candidate.email}</span>
+                    <span>{email}</span>
                   </span>
                 )}
-                {candidate.phone && (
+                {phone && (
                   <span className="flex items-center gap-1">
                     <Phone size={12} className="text-[#888888]" />
-                    <span>{candidate.phone}</span>
+                    <span>{phone}</span>
                   </span>
                 )}
-                {candidate.location && (
+                {location && (
                   <span className="flex items-center gap-1">
                     <MapPin size={12} className="text-[#888888]" />
-                    <span>{candidate.location}</span>
+                    <span>{location}</span>
                   </span>
                 )}
               </div>
@@ -99,7 +115,7 @@ export default function CandidateDetailModal({
             <button
               onClick={() => onUpdateDecision('SHORTLISTED')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
-                candidate.recruiterDecision === 'SHORTLISTED'
+                decision === 'SHORTLISTED'
                   ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm'
                   : 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
               }`}
@@ -111,7 +127,7 @@ export default function CandidateDetailModal({
             <button
               onClick={() => onUpdateDecision('REVIEW')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
-                candidate.recruiterDecision === 'REVIEW'
+                decision === 'REVIEW'
                   ? 'bg-amber-600 border-amber-600 text-white shadow-sm'
                   : 'bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100'
               }`}
@@ -123,7 +139,7 @@ export default function CandidateDetailModal({
             <button
               onClick={() => onUpdateDecision('REJECTED')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
-                candidate.recruiterDecision === 'REJECTED'
+                decision === 'REJECTED'
                   ? 'bg-rose-600 border-rose-600 text-white shadow-sm'
                   : 'bg-rose-50 border-rose-200 text-rose-800 hover:bg-rose-100'
               }`}
@@ -148,10 +164,10 @@ export default function CandidateDetailModal({
               Deterministic Fit Score
             </span>
             <div className="text-2xl font-black font-mono text-[#111111]">
-              {candidate.fitScore}%
+              {score}%
             </div>
             <span className="text-[10px] font-bold text-emerald-700 block">
-              {candidate.fitScore >= 80 ? 'Strong Match' : candidate.fitScore >= 50 ? 'Review' : 'Low Fit'}
+              {score >= 80 ? 'Strong Match' : score >= 50 ? 'Review' : 'Low Fit'}
             </span>
           </div>
 
@@ -160,7 +176,7 @@ export default function CandidateDetailModal({
               Critical Reqs
             </span>
             <div className="text-2xl font-black font-mono text-[#111111]">
-              {candidate.criticalRequirementsMet} / {candidate.criticalRequirementsTotal}
+              {critMet} / {critTotal}
             </div>
             <span className="text-[10px] font-bold text-[#666666] block">
               Essential criteria met
@@ -175,7 +191,7 @@ export default function CandidateDetailModal({
               {candidate.yearsOfExperience ? `${candidate.yearsOfExperience} Yrs` : 'Detected'}
             </div>
             <span className="text-[10px] font-bold text-[#666666] block">
-              Relevant background
+              {candidate.mostRecentRole || 'Relevant background'}
             </span>
           </div>
 
@@ -184,7 +200,7 @@ export default function CandidateDetailModal({
               Evidence Quality
             </span>
             <div className="text-2xl font-black font-mono text-[#111111]">
-              {candidate.evidenceStrength || 'HIGH'}
+              {candidate.evidenceQuality || 'HIGH'}
             </div>
             <span className="text-[10px] font-bold text-emerald-700 block">
               Verbatim grounded
@@ -213,7 +229,7 @@ export default function CandidateDetailModal({
                 : 'hover:text-black'
             }`}
           >
-            Evidence Explorer ({analysis.fields.length})
+            Evidence Explorer ({(analysis.fields || []).length})
           </button>
 
           <button
@@ -224,10 +240,10 @@ export default function CandidateDetailModal({
                 : 'hover:text-black'
             }`}
           >
-            Requirements Matrix ({analysis.requirements.length})
+            Requirements Matrix ({(analysis.requirements || []).length})
           </button>
 
-          {candidate.flags && candidate.flags.length > 0 && (
+          {candidate.reviewFlags && candidate.reviewFlags.length > 0 && (
             <button
               onClick={() => setActiveTab('FLAGS')}
               className={`px-3.5 py-1.5 rounded-lg transition-all ${
@@ -236,7 +252,7 @@ export default function CandidateDetailModal({
                   : 'hover:text-black'
               }`}
             >
-              Audit Notices ({candidate.flags.length})
+              Audit Notices ({candidate.reviewFlags.length})
             </button>
           )}
         </div>
@@ -248,21 +264,21 @@ export default function CandidateDetailModal({
             <div className="p-5 bg-[#F8F8F7] border border-[#E5E5E5] rounded-2xl space-y-3">
               <h4 className="text-xs font-bold font-mono text-[#111111] uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles size={14} className="text-[#111111]" />
-                <span>Why This Candidate Ranked #{candidate.rank}</span>
+                <span>Why This Candidate Ranked #{candidate.rank || 1}</span>
               </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[#555555]">
                 <div className="p-3 bg-white border border-[#E5E5E5] rounded-xl space-y-1">
                   <span className="font-bold text-[#111111] block">1. Requirement Match</span>
                   <p>
-                    Satisfied {candidate.criticalRequirementsMet} critical job qualifications with verbatim evidence traces.
+                    Satisfied {critMet} critical job qualifications with verbatim evidence traces.
                   </p>
                 </div>
 
                 <div className="p-3 bg-white border border-[#E5E5E5] rounded-xl space-y-1">
                   <span className="font-bold text-[#111111] block">2. Evidence Grounding</span>
                   <p>
-                    Extracted {analysis.fields.filter((f) => f.status === 'FOUND').length} structured canonical fields directly from resume text.
+                    Extracted {(analysis.fields || []).filter((f: any) => f.status === 'FOUND').length} structured canonical fields directly from resume text.
                   </p>
                 </div>
 
@@ -280,17 +296,21 @@ export default function CandidateDetailModal({
               {/* Skills */}
               <div className="p-5 bg-white border border-[#E5E5E5] rounded-xl space-y-2.5">
                 <h5 className="text-xs font-bold font-mono text-[#111111] uppercase">
-                  Verified Skills ({candidate.skills.length})
+                  Verified Skills ({skillsList.length})
                 </h5>
                 <div className="flex flex-wrap gap-1.5">
-                  {candidate.skills.map((s, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#F5F5F4] text-[#111111] border border-[#E5E5E5]"
-                    >
-                      {s}
-                    </span>
-                  ))}
+                  {skillsList.length > 0 ? (
+                    skillsList.map((s, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#F5F5F4] text-[#111111] border border-[#E5E5E5]"
+                      >
+                        {s}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs text-[#888888] italic">No explicit skills listed</span>
+                  )}
                 </div>
               </div>
 
@@ -302,15 +322,15 @@ export default function CandidateDetailModal({
                 <div className="space-y-1.5">
                   <div>
                     <span className="font-bold text-[#111111]">Degree: </span>
-                    <span>{analysis.candidate.highest_degree || 'Detected in profile'}</span>
+                    <span>{candidate.highestDegree || analysis.candidate?.highest_degree || 'Detected in profile'}</span>
                   </div>
                   <div>
                     <span className="font-bold text-[#111111]">Recent Role: </span>
-                    <span>{analysis.candidate.most_recent_role || 'Software Engineering'}</span>
+                    <span>{candidate.mostRecentRole || analysis.candidate?.most_recent_role || 'Software Engineering'}</span>
                   </div>
                   <div>
                     <span className="font-bold text-[#111111]">Location: </span>
-                    <span>{analysis.candidate.location || 'Remote / Unspecified'}</span>
+                    <span>{location || 'Remote / Unspecified'}</span>
                   </div>
                 </div>
               </div>
@@ -319,27 +339,26 @@ export default function CandidateDetailModal({
         )}
 
         {activeTab === 'EVIDENCE' && (
-          <EvidenceExplorer fields={analysis.fields} />
+          <EvidenceExplorer fields={analysis.fields || []} />
         )}
 
         {activeTab === 'REQUIREMENTS' && (
-          <RequirementMatrix requirements={analysis.requirements} />
+          <RequirementMatrix requirements={analysis.requirements || []} />
         )}
 
-        {activeTab === 'FLAGS' && candidate.flags && (
+        {activeTab === 'FLAGS' && candidate.reviewFlags && (
           <div className="space-y-3">
-            {candidate.flags.map((flag, idx) => (
+            {candidate.reviewFlags.map((flag, idx) => (
               <div
                 key={idx}
                 className="p-4 bg-[#F8F8F7] border border-[#E5E5E5] rounded-xl space-y-1 text-xs"
               >
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold text-[#111111] uppercase text-[10px] bg-white border border-[#E5E5E5] px-1.5 py-0.2 rounded">
-                    {flag.category}
+                    Audit
                   </span>
-                  <span className="font-bold text-[#111111]">{flag.title}</span>
+                  <span className="font-bold text-[#111111]">{flag}</span>
                 </div>
-                <p className="text-[#666666] font-sans">{flag.description}</p>
               </div>
             ))}
           </div>

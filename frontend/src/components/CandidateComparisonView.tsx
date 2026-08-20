@@ -39,8 +39,13 @@ export default function CandidateComparisonView({
 
   // Collect unique requirements from the compared candidates
   const allReqTitles = Array.from(
-    new Set(comparedCandidates.flatMap((c) => c.data.requirements.map((r) => r.requirement))),
+    new Set(
+      comparedCandidates.flatMap((c) =>
+        Array.isArray(c.data?.requirements) ? c.data.requirements.map((r) => r.requirement) : [],
+      ),
+    ),
   )
+
 
   return (
     <div className="space-y-6">

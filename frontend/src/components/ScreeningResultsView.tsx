@@ -24,6 +24,7 @@ import {
 import type { JobOpening, RankedCandidate, RecruiterDecisionStatus } from '../types/recruiter'
 import CandidateDetailModal from './CandidateDetailModal'
 import CandidateComparisonModal from './CandidateComparisonModal'
+import ErrorBoundary from './ErrorBoundary'
 
 interface ScreeningResultsViewProps {
   job: JobOpening
@@ -32,9 +33,49 @@ interface ScreeningResultsViewProps {
   onUpdateCandidateDecision: (candidateId: string, decision: RecruiterDecisionStatus) => void
 }
 
+// ── Defensive Helper Getters ──────────────────────────────────────────────────
+function getCandidateName(c: RankedCandidate): string {
+  return (c.candidateName || c.name || c.data?.candidate?.full_name || 'Candidate').trim()
+}
+
+function getCandidateEmail(c: RankedCandidate): string {
+  return (c.email || c.data?.candidate?.email || '').trim()
+}
+
+function getCandidateScore(c: RankedCandidate): number {
+  if (typeof c.weightedFitScore === 'number') return c.weightedFitScore
+  if (typeof c.rawFitScore === 'number') return c.rawFitScore
+  if (typeof c.fitScore === 'number') return c.fitScore
+  return c.data?.fit_score?.fit_score ?? 0
+}
+
+function getCandidateSkills(c: RankedCandidate): string[] {
+  if (Array.isArray(c.skills) && c.skills.length > 0) return c.skills
+  if (Array.isArray(c.data?.candidate?.skills) && c.data.candidate.skills.length > 0) return c.data.candidate.skills
+  const skillsField = c.data?.fields?.find((f) => f.field_id === 'SKILLS-LIST')
+  if (skillsField?.value) return skillsField.value.split(',').map((s) => s.trim())
+  return []
+}
+
+function getCriticalMet(c: RankedCandidate): number {
+  if (typeof c.criticalMatched === 'number') return c.criticalMatched
+  if (typeof c.criticalRequirementsMet === 'number') return c.criticalRequirementsMet
+  return c.data?.fit_score?.matched ?? 0
+}
+
+function getCriticalTotal(c: RankedCandidate): number {
+  if (typeof c.criticalTotal === 'number' && c.criticalTotal > 0) return c.criticalTotal
+  if (typeof c.criticalRequirementsTotal === 'number' && c.criticalRequirementsTotal > 0) return c.criticalRequirementsTotal
+  return c.data?.fit_score?.total || 1
+}
+
+function getDecision(c: RankedCandidate): RecruiterDecisionStatus {
+  return c.recruiterDecision || 'UNDECIDED'
+}
+
 export default function ScreeningResultsView({
   job,
-  candidates,
+  candidates = [],
   onOpenNewScreening,
   onUpdateCandidateDecision,
 }: ScreeningResultsViewProps) {
@@ -49,38 +90,58 @@ export default function ScreeningResultsView({
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<string[]>([])
   const [isComparisonOpen, setIsComparisonOpen] = useState(false)
 
-  // Filter and Sort Candidates
+  // Filter and Sort Candidates (Defensive against nulls)
   const filteredCandidates = useMemo(() => {
-    return candidates
+    const q = (searchQuery || '').trim().toLowerCase()
+
+    return (candidates || [])
       .filter((c) => {
+        if (!c) return false
+
+        const name = getCandidateName(c).toLowerCase()
+        const email = getCandidateEmail(c).toLowerCase()
+        const skills = getCandidateSkills(c)
+
         const matchesQuery =
-          c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          c.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          c.skills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()))
+          !q ||
+          name.includes(q) ||
+          email.includes(q) ||
+          skills.some((s) => (s || '').toLowerCase().includes(q))
 
         if (!matchesQuery) return false
 
-        if (statusFilter === 'STRONG') return c.fitScore >= 80
-        if (statusFilter === 'REVIEW') return c.fitScore >= 50 && c.fitScore < 80
-        if (statusFilter === 'LOW') return c.fitScore < 50
-        if (statusFilter === 'SHORTLISTED') return c.recruiterDecision === 'SHORTLISTED'
-        if (statusFilter === 'UNDECIDED') return c.recruiterDecision === 'UNDECIDED' || !c.recruiterDecision
+        const score = getCandidateScore(c)
+        const decision = getDecision(c)
+
+        if (statusFilter === 'STRONG') return score >= 80
+        if (statusFilter === 'REVIEW') return score >= 50 && score < 80
+        if (statusFilter === 'LOW') return score < 50
+        if (statusFilter === 'SHORTLISTED') return decision === 'SHORTLISTED'
+        if (statusFilter === 'UNDECIDED') return decision === 'UNDECIDED'
 
         return true
       })
       .sort((a, b) => {
-        if (sortBy === 'SCORE') return b.fitScore - a.fitScore
-        if (sortBy === 'CRITICAL') return b.criticalRequirementsMet - a.criticalRequirementsMet
+        const scoreA = getCandidateScore(a)
+        const scoreB = getCandidateScore(b)
+        const critA = getCriticalMet(a)
+        const critB = getCriticalMet(b)
+
+        if (sortBy === 'SCORE') return scoreB - scoreA
+        if (sortBy === 'CRITICAL') return critB - critA
         if (sortBy === 'EXPERIENCE') return (b.yearsOfExperience || 0) - (a.yearsOfExperience || 0)
-        return a.rank - b.rank
+        return (a.rank || 0) - (b.rank || 0)
       })
   }, [candidates, searchQuery, statusFilter, sortBy])
 
   // Count summaries
-  const strongCount = candidates.filter((c) => c.fitScore >= 80).length
-  const reviewCount = candidates.filter((c) => c.fitScore >= 50 && c.fitScore < 80).length
-  const lowCount = candidates.filter((c) => c.fitScore < 50).length
-  const shortlistedCount = candidates.filter((c) => c.recruiterDecision === 'SHORTLISTED').length
+  const strongCount = (candidates || []).filter((c) => getCandidateScore(c) >= 80).length
+  const reviewCount = (candidates || []).filter((c) => {
+    const s = getCandidateScore(c)
+    return s >= 50 && s < 80
+  }).length
+  const lowCount = (candidates || []).filter((c) => getCandidateScore(c) < 50).length
+  const shortlistedCount = (candidates || []).filter((c) => getDecision(c) === 'SHORTLISTED').length
 
   const toggleSelectCandidate = (id: string) => {
     setSelectedCandidateIds((prev) =>
@@ -88,7 +149,7 @@ export default function ScreeningResultsView({
     )
   }
 
-  const comparedCandidates = candidates.filter((c) => selectedCandidateIds.includes(c.id))
+  const comparedCandidates = (candidates || []).filter((c) => selectedCandidateIds.includes(c.id))
 
   return (
     <div className="space-y-6">
@@ -97,20 +158,20 @@ export default function ScreeningResultsView({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-mono font-bold bg-[#F5F5F4] text-[#111111] px-2.5 py-0.5 rounded border border-[#E5E5E5]">
-              {job.department || 'Engineering'}
+              {job?.department || 'Engineering'}
             </span>
             <span className="text-xs text-[#777777] font-mono flex items-center gap-1">
               <MapPin size={12} />
-              <span>{job.location || 'Remote'}</span>
+              <span>{job?.location || 'Remote'}</span>
             </span>
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-[#111111] tracking-tight">
-            {job.title}
+            {job?.title || 'Job Screening'}
           </h2>
 
           <p className="text-xs sm:text-sm text-[#666666] font-sans max-w-3xl line-clamp-1">
-            {job.job_description}
+            {job?.job_description || 'Screening candidate resumes against target job description.'}
           </p>
         </div>
 
@@ -149,7 +210,7 @@ export default function ScreeningResultsView({
           </span>
           <div className="flex items-baseline gap-1.5 mt-0.5">
             <span className="text-2xl font-black font-mono text-[#111111]">
-              {candidates.length}
+              {(candidates || []).length}
             </span>
             <span className="text-[10px] text-[#777777] font-medium">candidates</span>
           </div>
@@ -305,27 +366,41 @@ export default function ScreeningResultsView({
                   <td colSpan={10} className="py-12 text-center text-[#777777]">
                     <div className="space-y-2">
                       <Users size={28} className="mx-auto text-[#AAAAAA]" />
-                      <p className="font-semibold text-sm text-[#111111]">No candidates match the selected filters.</p>
-                      <p className="text-xs text-[#777777]">Try adjusting your search query or status filter.</p>
+                      <p className="font-semibold text-sm text-[#111111]">
+                        {candidates.length === 0
+                          ? 'No candidates have been screened for this job yet.'
+                          : 'No candidates match the selected filters.'}
+                      </p>
+                      <p className="text-xs text-[#777777]">
+                        {candidates.length === 0
+                          ? 'Click "+ Screen More Resumes" to evaluate candidate resumes.'
+                          : 'Try adjusting your search query or status filter.'}
+                      </p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                filteredCandidates.map((cand) => {
+                filteredCandidates.map((cand, idx) => {
                   const isChecked = selectedCandidateIds.includes(cand.id)
+                  const name = getCandidateName(cand)
+                  const email = getCandidateEmail(cand)
+                  const score = getCandidateScore(cand)
+                  const critMet = getCriticalMet(cand)
+                  const critTotal = getCriticalTotal(cand)
+                  const decision = getDecision(cand)
 
                   const fitColor =
-                    cand.fitScore >= 80
+                    score >= 80
                       ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                      : cand.fitScore >= 50
+                      : score >= 50
                       ? 'text-amber-700 bg-amber-50 border-amber-200'
                       : 'text-rose-700 bg-rose-50 border-rose-200'
 
                   return (
                     <tr
-                      key={cand.id}
+                      key={cand.id || `cand-${idx}`}
                       className={`hover:bg-[#FAFAFA] transition-colors ${
-                        cand.recruiterDecision === 'SHORTLISTED' ? 'bg-[#FDFDFD]' : ''
+                        decision === 'SHORTLISTED' ? 'bg-[#FDFDFD]' : ''
                       }`}
                     >
                       {/* Checkbox for batch compare */}
@@ -340,7 +415,7 @@ export default function ScreeningResultsView({
 
                       {/* Rank */}
                       <td className="py-3.5 px-4 font-mono font-black text-[#111111] text-sm">
-                        #{cand.rank}
+                        #{cand.rank || idx + 1}
                       </td>
 
                       {/* Candidate Name & Contact */}
@@ -350,33 +425,33 @@ export default function ScreeningResultsView({
                             onClick={() => setSelectedCandidate(cand)}
                             className="font-bold text-[#111111] text-sm hover:underline cursor-pointer"
                           >
-                            {cand.name}
+                            {name}
                           </span>
-                          {cand.flags && cand.flags.length > 0 && (
+                          {cand.reviewFlags && cand.reviewFlags.length > 0 && (
                             <span
-                              title={cand.flags.map((f) => f.title).join('\n')}
+                              title={cand.reviewFlags.join('\n')}
                               className="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-[#F5F5F4] text-[#111111] border border-[#E5E5E5] cursor-help"
                             >
-                              {cand.flags.length} Audit
+                              {cand.reviewFlags.length} Audit
                             </span>
                           )}
                         </div>
                         <p className="text-[11px] text-[#777777] font-mono">
-                          {cand.email || 'No email provided'}
+                          {email || 'No email provided'}
                         </p>
                       </td>
 
                       {/* Fit Score */}
                       <td className="py-3.5 px-4">
                         <div className="inline-flex items-center gap-1.5 font-mono font-black text-sm px-2.5 py-1 rounded-md border border-[#E5E5E5] bg-[#F8F8F7] text-[#111111]">
-                          <span>{cand.fitScore}%</span>
+                          <span>{score}%</span>
                         </div>
                       </td>
 
                       {/* Critical Requirements Met */}
                       <td className="py-3.5 px-4 font-mono text-xs">
                         <span className="font-bold text-[#111111]">
-                          {cand.criticalRequirementsMet} / {cand.criticalRequirementsTotal}
+                          {critMet} / {critTotal}
                         </span>
                         <span className="text-[10px] text-[#777777] block">Critical met</span>
                       </td>
@@ -387,7 +462,7 @@ export default function ScreeningResultsView({
                           {cand.yearsOfExperience ? `${cand.yearsOfExperience} Years` : 'Detected'}
                         </span>
                         <span className="text-[10px] text-[#777777] font-mono truncate max-w-[140px] block">
-                          {cand.currentTitle || 'Professional'}
+                          {cand.mostRecentRole || cand.currentTitle || 'Professional'}
                         </span>
                       </td>
 
@@ -395,14 +470,14 @@ export default function ScreeningResultsView({
                       <td className="py-3.5 px-4 font-mono text-xs">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                            cand.evidenceStrength === 'STRONG'
+                            cand.evidenceQuality === 'HIGH'
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                              : cand.evidenceStrength === 'MODERATE'
+                              : cand.evidenceQuality === 'MEDIUM'
                               ? 'bg-amber-50 text-amber-800 border-amber-200'
                               : 'bg-[#F5F5F4] text-[#111111] border-[#E5E5E5]'
                           }`}
                         >
-                          {cand.evidenceStrength || 'VERIFIED'}
+                          {cand.evidenceQuality || 'VERIFIED'}
                         </span>
                       </td>
 
@@ -411,14 +486,14 @@ export default function ScreeningResultsView({
                         <span
                           className={`px-2.5 py-1 rounded-md text-[10px] font-mono font-bold border ${fitColor}`}
                         >
-                          {cand.aiRecommendation || (cand.fitScore >= 80 ? 'STRONG MATCH' : cand.fitScore >= 50 ? 'REVIEW' : 'LOW FIT')}
+                          {cand.aiRecommendation || (score >= 80 ? 'STRONG MATCH' : score >= 50 ? 'REVIEW' : 'LOW FIT')}
                         </span>
                       </td>
 
                       {/* Recruiter Decision Dropdown */}
                       <td className="py-3.5 px-4">
                         <select
-                          value={cand.recruiterDecision || 'UNDECIDED'}
+                          value={decision}
                           onChange={(e) =>
                             onUpdateCandidateDecision(
                               cand.id,
@@ -426,11 +501,11 @@ export default function ScreeningResultsView({
                             )
                           }
                           className={`text-xs font-bold rounded-lg px-2.5 py-1.5 border outline-none cursor-pointer transition-colors ${
-                            cand.recruiterDecision === 'SHORTLISTED'
+                            decision === 'SHORTLISTED'
                               ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-                              : cand.recruiterDecision === 'REVIEW'
+                              : decision === 'REVIEW'
                               ? 'bg-amber-50 text-amber-900 border-amber-300'
-                              : cand.recruiterDecision === 'REJECTED'
+                              : decision === 'REJECTED'
                               ? 'bg-rose-50 text-rose-900 border-rose-300'
                               : 'bg-[#F8F8F7] text-[#111111] border-[#E5E5E5]'
                           }`}
@@ -463,23 +538,27 @@ export default function ScreeningResultsView({
 
       {/* ── Candidate Deep Detail Modal ── */}
       {selectedCandidate && (
-        <CandidateDetailModal
-          candidate={selectedCandidate}
-          jobDescription={job.job_description}
-          onClose={() => setSelectedCandidate(null)}
-          onUpdateDecision={(decision) => {
-            onUpdateCandidateDecision(selectedCandidate.id, decision)
-            setSelectedCandidate((prev) => (prev ? { ...prev, recruiterDecision: decision } : null))
-          }}
-        />
+        <ErrorBoundary title="Candidate Detail Notice">
+          <CandidateDetailModal
+            candidate={selectedCandidate}
+            jobDescription={job?.job_description || ''}
+            onClose={() => setSelectedCandidate(null)}
+            onUpdateDecision={(decision) => {
+              onUpdateCandidateDecision(selectedCandidate.id, decision)
+              setSelectedCandidate((prev) => (prev ? { ...prev, recruiterDecision: decision } : null))
+            }}
+          />
+        </ErrorBoundary>
       )}
 
       {/* ── Side-by-Side Comparison Modal ── */}
       {isComparisonOpen && comparedCandidates.length >= 2 && (
-        <CandidateComparisonModal
-          candidates={comparedCandidates}
-          onClose={() => setIsComparisonOpen(false)}
-        />
+        <ErrorBoundary title="Comparison Notice">
+          <CandidateComparisonModal
+            candidates={comparedCandidates}
+            onClose={() => setIsComparisonOpen(false)}
+          />
+        </ErrorBoundary>
       )}
     </div>
   )
