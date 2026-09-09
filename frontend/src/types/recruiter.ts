@@ -14,6 +14,7 @@ export interface JobOpening {
   created_at: string
   candidates_count: number
   strong_matches_count: number
+  needs_review_count?: number
   shortlisted_count: number
 }
 

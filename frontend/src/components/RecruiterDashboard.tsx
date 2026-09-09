@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Building,
   TrendingUp,
+  RefreshCw,
 } from 'lucide-react'
 import type { JobOpening } from '../types/recruiter'
 import ResponsibleAINotice from './ResponsibleAINotice'
@@ -21,20 +22,30 @@ interface RecruiterDashboardProps {
   jobs: JobOpening[]
   onOpenJob: (job: JobOpening) => void
   onNewScreening: () => void
+  onCreateOpening?: () => void
   onViewCandidates: () => void
+  dbError?: string | null
+  onRetry?: () => void
 }
 
 export default function RecruiterDashboard({
   jobs,
   onOpenJob,
   onNewScreening,
+  onCreateOpening,
   onViewCandidates,
+  dbError,
+  onRetry,
 }: RecruiterDashboardProps) {
-  // Aggregate real numbers across jobs
+  const handleCreateOpening = onCreateOpening || onNewScreening
+
+  // Aggregate real numbers across jobs fetched from Supabase
   const totalCandidates = jobs.reduce((sum, j) => sum + (j.candidates_count || 0), 0)
   const totalStrongMatches = jobs.reduce((sum, j) => sum + (j.strong_matches_count || 0), 0)
+  const totalNeedsReview = jobs.reduce((sum, j) => sum + (j.needs_review_count || 0), 0)
   const totalShortlisted = jobs.reduce((sum, j) => sum + (j.shortlisted_count || 0), 0)
-  const totalNeedsReview = Math.max(0, totalCandidates - totalStrongMatches - totalShortlisted)
+
+
 
   return (
     <div className="space-y-8">
@@ -77,6 +88,42 @@ export default function RecruiterDashboard({
 
       {/* ── 2. Responsible AI Notice ── */}
       <ResponsibleAINotice />
+
+      {/* ── 2b. Database Connection Alert (if Supabase error occurs) ── */}
+      {dbError && (
+        <div className="dash-card p-6 bg-red-50/70 border border-red-200 rounded-xl space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-red-100 border border-red-300 flex items-center justify-center text-red-700 flex-shrink-0 mt-0.5">
+              <AlertTriangle size={16} />
+            </div>
+            <div className="space-y-1 flex-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-700 bg-red-100 px-2 py-0.5 rounded border border-red-200">
+                Database Error
+              </span>
+              <h4 className="text-sm font-bold text-red-950">
+                Failed to load live data from Supabase
+              </h4>
+              <p className="text-xs text-red-800 font-sans leading-relaxed">
+                {dbError}
+              </p>
+              <div className="pt-2 flex items-center gap-3">
+                {onRetry && (
+                  <button
+                    onClick={onRetry}
+                    className="px-3 py-1.5 bg-red-800 text-white rounded-lg text-xs font-bold hover:bg-red-900 transition-colors flex items-center gap-1.5"
+                  >
+                    <RefreshCw size={12} />
+                    <span>Retry Connection</span>
+                  </button>
+                )}
+                <span className="text-[11px] text-red-700 font-mono">
+                  Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Netlify / .env
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── 3. Four Core Recruiter Metrics ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -166,7 +213,7 @@ export default function RecruiterDashboard({
           </div>
 
           <button
-            onClick={onNewScreening}
+            onClick={handleCreateOpening}
             className="text-xs font-bold text-[#111111] hover:text-black flex items-center gap-1 hover:underline"
           >
             <span>+ Create Opening</span>

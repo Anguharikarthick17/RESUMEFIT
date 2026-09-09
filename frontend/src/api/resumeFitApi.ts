@@ -248,113 +248,43 @@ export async function runScreeningSession(
   }
 }
 
+import {
+  fetchJobOpeningsFromSupabase,
+  fetchJobCandidatesFromSupabase,
+  persistCandidateDecisionToSupabase,
+} from './supabaseService'
+
 /**
- * Fetch Jobs from Supabase/Backend (GET /api/jobs)
+ * Fetch Jobs from Supabase (Single Source of Truth)
  */
 export async function fetchJobsList(): Promise<JobOpening[]> {
-  try {
-    const res = await fetch(`${API_BASE}/api/jobs`)
-    if (!res.ok) return []
-    return await res.json()
-  } catch {
-    return []
-  }
+  return await fetchJobOpeningsFromSupabase()
 }
 
 /**
- * Fetch Active Jobs for Candidate Marketplace (GET /api/jobs/active)
+ * Fetch Active Jobs for Candidate Marketplace (from Supabase)
  */
 export async function fetchActiveJobs(): Promise<JobOpening[]> {
-  try {
-    const res = await fetch(`${API_BASE}/api/jobs/active`)
-    if (!res.ok) return []
-    return await res.json()
-  } catch {
-    return []
-  }
+  return await fetchJobOpeningsFromSupabase()
 }
 
 /**
- * Fetch Candidates for a Job (GET /api/jobs/{job_id}/results)
+ * Fetch Candidates for a Job from Supabase
  */
 export async function fetchJobCandidates(jobId: string): Promise<RankedCandidate[]> {
-  try {
-    const res = await fetch(`${API_BASE}/api/jobs/${jobId}/results`)
-    if (!res.ok) return []
-    const data: any[] = await res.json()
-
-    return data.map((item, idx) => {
-      const candObj = item.candidates || item.candidate || {}
-      const candName = candObj.name || item.candidate_name || 'Candidate'
-      
-      const evidenceFields = Array.isArray(item.evidence) ? item.evidence : []
-      const reqList = Array.isArray(item.requirements) ? item.requirements : []
-
-      const skillsField = evidenceFields.find((f: any) => f.field_id === 'SKILLS-LIST')
-      const extractedSkills = candObj.skills ||
-        (skillsField?.value ? skillsField.value.split(',').map((s: string) => s.trim()) : [])
-
-      const analysisResp: AnalysisResponse = {
-        candidate: {
-          full_name: candName,
-          email: candObj.email || null,
-          phone: candObj.phone || null,
-          location: candObj.location || null,
-          linkedin_url: candObj.linkedin_url || null,
-          highest_degree: candObj.highest_degree || candObj.summary || null,
-          most_recent_role: candObj.most_recent_role || candObj.summary || null,
-          skills: extractedSkills,
-        },
-        fields: evidenceFields,
-        sections_found: [],
-        requirements: reqList,
-        fit_score: {
-          fit_score: typeof item.fit_score === 'number' ? item.fit_score : 0,
-          score_label: item.status === 'strong_match' ? 'Strong Match' : 'Needs Review',
-          matched: item.matched_count || 0,
-          partial: item.partial_count || 0,
-          missing: item.missing_count || 0,
-          total: (item.matched_count || 0) + (item.partial_count || 0) + (item.missing_count || 0),
-        },
-        errors: [],
-      }
-
-      const r = transformAnalysisToRankedCandidate(candName, analysisResp, idx)
-      r.id = item.id || `res-${idx}`
-      r.rank = item.rank || idx + 1
-      if (item.recruiter_decisions?.decision) {
-        r.recruiterDecision = item.recruiter_decisions.decision.toUpperCase() as RecruiterDecisionStatus
-      }
-      return r
-    })
-  } catch (err) {
-    console.error('Error fetching job candidates:', err)
-    return []
-  }
+  return await fetchJobCandidatesFromSupabase(jobId)
 }
 
 /**
- * Persist Recruiter Decision to Supabase/Backend (POST /api/decisions)
+ * Persist Recruiter Decision to Supabase
  */
 export async function persistRecruiterDecision(
   screeningResultId: string,
   decision: RecruiterDecisionStatus,
   notes?: string,
 ): Promise<boolean> {
-  try {
-    const res = await fetch(`${API_BASE}/api/decisions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        screening_result_id: screeningResultId,
-        decision: decision.toLowerCase(),
-        notes,
-      }),
-    })
-    return res.ok
-  } catch {
-    return false
-  }
+  return await persistCandidateDecisionToSupabase(screeningResultId, decision, notes)
 }
 
 export const analyzeResumeApi = analyzeResume
+

@@ -159,22 +159,41 @@ def create_or_get_job(
 def get_all_jobs() -> List[Dict[str, Any]]:
     if is_supabase_enabled():
         try:
-            res = _supabase_client.table("jobs").select("*").order("created_at", desc=True).execute()
-            jobs = res.data or []
-            for j in jobs:
-                res_count = _supabase_client.table("screening_results").select("id", count="exact").eq("job_id", j["id"]).execute()
-                app_count = _supabase_client.table("job_applications").select("id", count="exact").eq("job_id", j["id"]).execute()
-                j["candidates_count"] = max(res_count.count or 0, app_count.count or 0)
-                
-                strong_count = _supabase_client.table("screening_results").select("id", count="exact").eq("job_id", j["id"]).eq("status", "strong_match").execute()
-                j["strong_matches_count"] = strong_count.count or 0
+            # 1. Try querying canonical job_openings table
+            try:
+                res = _supabase_client.table("job_openings").select("*").ilike("status", "active").order("created_at", desc=True).execute()
+                jobs = res.data or []
+            except Exception:
+                res = _supabase_client.table("jobs").select("*").order("created_at", desc=True).execute()
+                jobs = res.data or []
 
-                shortlisted = _supabase_client.table("recruiter_decisions").select("id", count="exact").eq("decision", "shortlisted").execute()
-                j["shortlisted_count"] = shortlisted.count or 0
+            for j in jobs:
+                jid = j["id"]
+                if "job_description" not in j and "description" in j:
+                    j["job_description"] = j["description"]
+
+                # Try screenings table count
+                try:
+                    sc_count = _supabase_client.table("screenings").select("id", count="exact").eq("job_opening_id", jid).execute()
+                    sc_strong = _supabase_client.table("screenings").select("id", count="exact").eq("job_opening_id", jid).gte("fit_score", 80).execute()
+                    sc_short = _supabase_client.table("screenings").select("id", count="exact").eq("job_opening_id", jid).eq("review_status", "shortlisted").execute()
+                    j["candidates_count"] = sc_count.count or 0
+                    j["strong_matches_count"] = sc_strong.count or 0
+                    j["shortlisted_count"] = sc_short.count or 0
+                except Exception:
+                    res_count = _supabase_client.table("screening_results").select("id", count="exact").eq("job_id", jid).execute()
+                    app_count = _supabase_client.table("job_applications").select("id", count="exact").eq("job_id", jid).execute()
+                    j["candidates_count"] = max(res_count.count or 0, app_count.count or 0)
+                    strong_count = _supabase_client.table("screening_results").select("id", count="exact").eq("job_id", jid).eq("status", "strong_match").execute()
+                    j["strong_matches_count"] = strong_count.count or 0
+                    shortlisted = _supabase_client.table("recruiter_decisions").select("id", count="exact").eq("decision", "shortlisted").execute()
+                    j["shortlisted_count"] = shortlisted.count or 0
+
             if jobs:
                 return jobs
         except Exception as e:
             print(f"[Supabase] Error getting jobs: {e}")
+
 
     # Fallback in-memory
     jobs = list(_MEM_STORE["jobs"].values())

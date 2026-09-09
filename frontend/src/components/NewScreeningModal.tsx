@@ -13,24 +13,52 @@ import {
   Layers,
 } from 'lucide-react'
 import type { JobOpening, RankedCandidate } from '../types/recruiter'
-import { runScreeningSession } from '../api/resumeFitApi'
+import { runScreeningSession, fetchJobsList } from '../api/resumeFitApi'
 import { SAMPLE_CANDIDATES } from '../utils/demoDataGenerator'
-import { getStoredJobOpenings } from '../utils/recruiterStore'
+import { useEffect } from 'react'
 
 interface NewScreeningModalProps {
   onClose: () => void
   onCompleteScreening: (job: JobOpening, candidates: RankedCandidate[]) => void
+  jobs?: JobOpening[]
 }
 
-export default function NewScreeningModal({ onClose, onCompleteScreening }: NewScreeningModalProps) {
-  const existingJobs = getStoredJobOpenings()
+export default function NewScreeningModal({ onClose, onCompleteScreening, jobs = [] }: NewScreeningModalProps) {
+  const [existingJobs, setExistingJobs] = useState<JobOpening[]>(jobs)
 
-  const [selectedJobId, setSelectedJobId] = useState<string>(existingJobs[0]?.id || 'custom')
-  const [jobTitle, setJobTitle] = useState(existingJobs[0]?.title || 'AI / Machine Learning Engineer')
-  const [department, setDepartment] = useState(existingJobs[0]?.department || 'Engineering & Data')
-  const [location, setLocation] = useState(existingJobs[0]?.location || 'San Francisco, CA (Hybrid)')
-  const [experienceLevel, setExperienceLevel] = useState(existingJobs[0]?.experience_level || 'Mid-Senior (2+ years)')
-  const [jobDescription, setJobDescription] = useState(existingJobs[0]?.job_description || '')
+  const [selectedJobId, setSelectedJobId] = useState<string>(jobs[0]?.id || 'custom')
+  const [jobTitle, setJobTitle] = useState(jobs[0]?.title || 'AI / Machine Learning Engineer')
+  const [department, setDepartment] = useState(jobs[0]?.department || 'Engineering & Data')
+  const [location, setLocation] = useState(jobs[0]?.location || 'San Francisco, CA (Hybrid)')
+  const [experienceLevel, setExperienceLevel] = useState(jobs[0]?.experience_level || 'Mid-Senior (2+ years)')
+  const [jobDescription, setJobDescription] = useState(jobs[0]?.job_description || '')
+
+  useEffect(() => {
+    if (jobs.length > 0) {
+      setExistingJobs(jobs)
+      if (!selectedJobId || selectedJobId === 'custom') {
+        setSelectedJobId(jobs[0].id)
+        setJobTitle(jobs[0].title)
+        setDepartment(jobs[0].department)
+        setLocation(jobs[0].location)
+        setExperienceLevel(jobs[0].experience_level)
+        setJobDescription(jobs[0].job_description)
+      }
+    } else {
+      fetchJobsList().then((loaded) => {
+        if (loaded.length > 0) {
+          setExistingJobs(loaded)
+          setSelectedJobId(loaded[0].id)
+          setJobTitle(loaded[0].title)
+          setDepartment(loaded[0].department)
+          setLocation(loaded[0].location)
+          setExperienceLevel(loaded[0].experience_level)
+          setJobDescription(loaded[0].job_description)
+        }
+      }).catch(() => {})
+    }
+  }, [jobs])
+
 
   const [files, setFiles] = useState<File[]>([])
   const [isProcessing, setIsProcessing] = useState(false)

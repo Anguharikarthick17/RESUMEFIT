@@ -21,6 +21,7 @@ import ScreeningResultsView from './components/ScreeningResultsView'
 import ScreeningAnalyticsView from './components/ScreeningAnalyticsView'
 import AnalysisHistoryView from './components/AnalysisHistoryView'
 import NewScreeningModal from './components/NewScreeningModal'
+import CreateJobModal from './components/CreateJobModal'
 
 // Candidate Pages
 import CandidateProfileView from './pages/CandidateProfileView'
@@ -43,6 +44,7 @@ import {
   submitCandidateApplication,
   fetchCandidateApplications,
 } from './api/resumeFitApi'
+import { fetchScreeningHistoryFromSupabase } from './api/supabaseService'
 import { getAnalysisHistory, saveAnalysisSnapshot } from './utils/intelligenceEngine'
 
 export default function App() {
@@ -54,8 +56,10 @@ export default function App() {
   const [activeJob, setActiveJob] = useState<JobOpening | null>(null)
   const [candidates, setCandidates] = useState<RankedCandidate[]>([])
   const [isNewScreeningOpen, setIsNewScreeningOpen] = useState(false)
+  const [isCreateJobOpen, setIsCreateJobOpen] = useState(false)
   const [historyList, setHistoryList] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [dbError, setDbError] = useState<string | null>(null)
 
   // Candidate Portal State
   const [candidateAccount, setCandidateAccount] = useState<CandidateAccount | null>(null)
@@ -68,25 +72,50 @@ export default function App() {
 
   useEffect(() => {
     loadJobsData()
-    setHistoryList(getAnalysisHistory())
+    loadHistoryData()
   }, [])
+
+  const loadHistoryData = async () => {
+    try {
+      const hist = await fetchScreeningHistoryFromSupabase()
+      if (hist.length > 0) {
+        setHistoryList(hist)
+      } else {
+        setHistoryList(getAnalysisHistory())
+      }
+    } catch {
+      setHistoryList(getAnalysisHistory())
+    }
+  }
 
   const loadJobsData = async () => {
     setLoading(true)
+    setDbError(null)
     try {
       const serverJobs = await fetchJobsList()
       setJobs(serverJobs)
       if (serverJobs.length > 0) {
-        if (!activeJob) setActiveJob(serverJobs[0])
-        const jobCands = await fetchJobCandidates(serverJobs[0].id)
+        const target = activeJob ? (serverJobs.find((j) => j.id === activeJob.id) || serverJobs[0]) : serverJobs[0]
+        setActiveJob(target)
+        const jobCands = await fetchJobCandidates(target.id)
         setCandidates(jobCands)
+      } else {
+        setActiveJob(null)
+        setCandidates([])
       }
-    } catch (err) {
-      console.error('Failed to load jobs:', err)
+    } catch (err: any) {
+      console.error('Failed to load jobs from Supabase:', err)
+      setDbError(err?.message || 'Failed to connect to Supabase database. Please check configuration.')
     } finally {
       setLoading(false)
     }
   }
+
+  const handleJobCreated = async (newJob: JobOpening) => {
+    await loadJobsData()
+    setActiveJob(newJob)
+  }
+
 
   // Reload candidate matches & applications whenever candidate changes
   useEffect(() => {
@@ -228,7 +257,10 @@ export default function App() {
                       jobs={jobs}
                       onOpenJob={handleOpenJobInRecruiter}
                       onNewScreening={() => setIsNewScreeningOpen(true)}
+                      onCreateOpening={() => setIsCreateJobOpen(true)}
                       onViewCandidates={() => setCurrentTab('screening')}
+                      dbError={dbError}
+                      onRetry={loadJobsData}
                     />
                   </ErrorBoundary>
                 </motion.div>
@@ -253,7 +285,7 @@ export default function App() {
                       </h2>
                     </div>
                     <button
-                      onClick={() => setIsNewScreeningOpen(true)}
+                      onClick={() => setIsCreateJobOpen(true)}
                       className="btn-primary text-xs py-2 px-4 shadow-sm"
                     >
                       <PlusCircle size={14} />
@@ -264,12 +296,17 @@ export default function App() {
                   {jobs.length === 0 ? (
                     <div className="dash-card p-8 bg-white text-center text-xs text-[#777777] space-y-3">
                       <Briefcase size={28} className="mx-auto text-[#AAAAAA]" />
-                      <p className="font-semibold text-[#111111]">No active job openings yet.</p>
+                      <p className="font-semibold text-[#111111]">
+                        {dbError ? 'Could not load job openings.' : 'No active job openings yet.'}
+                      </p>
+                      {dbError && (
+                        <p className="text-xs text-red-600 font-mono max-w-md mx-auto">{dbError}</p>
+                      )}
                       <button
-                        onClick={() => setIsNewScreeningOpen(true)}
+                        onClick={() => setIsCreateJobOpen(true)}
                         className="btn-primary text-xs py-2 px-4 mx-auto"
                       >
-                        + Create Your First Screening
+                        + Create Your First Job Opening
                       </button>
                     </div>
                   ) : (
@@ -519,10 +556,18 @@ export default function App() {
       {/* ── New Screening Modal (Recruiter Only) ── */}
       {isNewScreeningOpen && (
         <NewScreeningModal
+          jobs={jobs}
           onClose={() => setIsNewScreeningOpen(false)}
           onCompleteScreening={handleCompleteNewScreening}
         />
       )}
+
+      {/* ── Create Job Opening Modal (Supabase Persistence) ── */}
+      <CreateJobModal
+        isOpen={isCreateJobOpen}
+        onClose={() => setIsCreateJobOpen(false)}
+        onJobCreated={handleJobCreated}
+      />
     </div>
   )
 }
