@@ -379,6 +379,96 @@ export async function persistCandidateDecisionToSupabase(
 }
 
 /**
+ * Persist an entire batch of screened candidates to Supabase (candidates + screenings)
+ * Ensures every uploaded resume (1, 2, 3, 7, 10+) is permanently stored in Supabase.
+ */
+export async function persistScreenedCandidatesToSupabase(
+  jobOpeningId: string,
+  candidates: RankedCandidate[],
+): Promise<void> {
+  if (!supabase || !candidates || candidates.length === 0) return
+
+  for (const cand of candidates) {
+    try {
+      // 1. Determine or generate a valid UUID for the candidate
+      let candId = cand.id || ''
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(candId)
+      if (!isUuid) {
+        candId = crypto.randomUUID()
+      }
+
+      // Check if candidate already exists by email
+      let targetCandId = candId
+      if (cand.email) {
+        const { data: existingCand } = await supabase
+          .from('candidates')
+          .select('id')
+          .eq('email', cand.email)
+          .limit(1)
+        if (existingCand && existingCand.length > 0) {
+          targetCandId = existingCand[0].id
+        }
+      }
+
+      // Upsert into candidates table
+      const candPayload = {
+        id: targetCandId,
+        name: cand.candidateName || cand.name || 'Candidate',
+        email: cand.email || null,
+        phone: cand.phone || null,
+        location: cand.location || null,
+        highest_degree: cand.highestDegree || null,
+        most_recent_role: cand.mostRecentRole || null,
+        skills: cand.skills || [],
+        experience: cand.experienceSummary || '',
+        summary: cand.experienceSummary || cand.currentTitle || null,
+        is_demo: false,
+      }
+
+      await supabase.from('candidates').upsert(candPayload, { onConflict: 'id' })
+
+      // 2. Check if a screening already exists for this candidate and job
+      const { data: existingSc } = await supabase
+        .from('screenings')
+        .select('id')
+        .eq('candidate_id', targetCandId)
+        .eq('job_opening_id', jobOpeningId)
+        .limit(1)
+
+      const fitScoreVal = Math.round(cand.fitScore ?? cand.rawFitScore ?? 75)
+      const screeningPayload = {
+        candidate_id: targetCandId,
+        job_opening_id: jobOpeningId,
+        fit_score: fitScoreVal,
+        status: fitScoreVal >= 80 ? 'Strong Match' : 'Needs Review',
+        recommendation: cand.aiRecommendation || (fitScoreVal >= 80 ? 'Strong Match' : 'Needs Review'),
+        review_status: (cand.recruiterDecision || 'UNDECIDED').toLowerCase(),
+        evidence: cand.data?.fields || [],
+        requirements: cand.data?.requirements || [],
+        updated_at: new Date().toISOString(),
+      }
+
+      if (existingSc && existingSc.length > 0) {
+        await supabase
+          .from('screenings')
+          .update(screeningPayload)
+          .eq('id', existingSc[0].id)
+      } else {
+        await supabase.from('screenings').insert([
+          {
+            id: crypto.randomUUID(),
+            ...screeningPayload,
+            screened_at: new Date().toISOString(),
+          },
+        ])
+      }
+    } catch (err) {
+      console.error(`[Supabase] Error persisting screened candidate ${cand.candidateName}:`, err)
+    }
+  }
+}
+
+/**
  * Fetch Screening History from Supabase
  */
 export async function fetchScreeningHistoryFromSupabase(): Promise<AnalysisSnapshot[]> {

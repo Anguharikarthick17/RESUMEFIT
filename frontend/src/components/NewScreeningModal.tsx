@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import type { JobOpening, RankedCandidate } from '../types/recruiter'
 import { runScreeningSession, fetchJobsList } from '../api/resumeFitApi'
+import { persistScreenedCandidatesToSupabase } from '../api/supabaseService'
 import { SAMPLE_CANDIDATES } from '../utils/demoDataGenerator'
 import { useEffect } from 'react'
 
@@ -151,7 +152,14 @@ ${cand.certs}
           setProgressMsg(msg)
           setProgressPct(pct)
         },
+        undefined,
+        selectedJobId,
       )
+
+      setProgressMsg('Persisting screened candidates to Supabase...')
+      setProgressPct(95)
+      const targetJobId = selectedJobId && selectedJobId !== 'custom' ? selectedJobId : job.id
+      await persistScreenedCandidatesToSupabase(targetJobId, candidates)
 
       await new Promise((r) => setTimeout(r, 300))
       onCompleteScreening(job, candidates)

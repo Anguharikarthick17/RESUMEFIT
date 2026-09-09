@@ -468,6 +468,26 @@ def save_screening_result(
                 "notes": None,
                 "decided_at": now,
             }).execute()
+
+            # Also persist to canonical screenings table used by frontend
+            try:
+                sc_record = {
+                    "id": result_id,
+                    "candidate_id": candidate_id,
+                    "job_opening_id": job_id,
+                    "fit_score": int(round(fit_score)),
+                    "status": "Strong Match" if fit_score >= 80 else "Needs Review",
+                    "recommendation": "Strong Match" if fit_score >= 80 else "Needs Review",
+                    "review_status": "review",
+                    "evidence": evidence_list,
+                    "requirements": requirements_list,
+                    "created_at": now,
+                    "updated_at": now,
+                }
+                _supabase_client.table("screenings").upsert(sc_record).execute()
+            except Exception as sc_err:
+                print(f"[Supabase] Notice on canonical screenings insert: {sc_err}")
+
             return res.data[0] if res.data else result_data
         except Exception as e:
             print(f"[Supabase] Error saving screening result: {e}")

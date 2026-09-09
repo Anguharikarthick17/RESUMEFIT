@@ -379,17 +379,27 @@ async def create_screening_session(
     job_description: str = Form(..., description="Job description requirements"),
     department: Optional[str] = Form(None, description="Department name"),
     location: Optional[str] = Form(None, description="Job location"),
+    job_id: Optional[str] = Form(None, description="Existing job opening ID"),
     resumes: List[UploadFile] = File(..., description="List of resume files"),
 ):
     if not resumes:
         raise HTTPException(status_code=400, detail="No resume files uploaded")
 
-    job = db.create_or_get_job(
-        title=job_title.strip(),
-        job_description=job_description.strip(),
-        department=department,
-        location=location,
-    )
+    if job_id and job_id.strip() and job_id.strip() != "custom":
+        job = {
+            "id": job_id.strip(),
+            "title": job_title.strip(),
+            "job_description": job_description.strip(),
+            "department": department or "Engineering",
+            "location": location or "Remote",
+        }
+    else:
+        job = db.create_or_get_job(
+            title=job_title.strip(),
+            job_description=job_description.strip(),
+            department=department,
+            location=location,
+        )
     job_id = job["id"]
 
     session = db.create_screening_session(job_id=job_id, total_candidates=len(resumes))
